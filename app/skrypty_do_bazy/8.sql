@@ -1,0 +1,31 @@
+USE [weppo]
+GO
+
+/****** Object:  Table [dbo].[CART]    Script Date: 01.02.2022 20:21:35 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[CART](
+	[id_user] [int] NULL,
+	[id_product] [int] NULL,
+	[amount] [int] NULL
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[CART]  WITH CHECK ADD  CONSTRAINT [FK_CART_PRODUCT] FOREIGN KEY([id_product])
+REFERENCES [dbo].[PRODUCT] ([id])
+GO
+
+ALTER TABLE [dbo].[CART] CHECK CONSTRAINT [FK_CART_PRODUCT]
+GO
+
+ALTER TABLE [dbo].[CART]  WITH CHECK ADD  CONSTRAINT [FK_CART_USER] FOREIGN KEY([id_user])
+REFERENCES [dbo].[USER] ([id])
+GO
+
+ALTER TABLE [dbo].[CART] CHECK CONSTRAINT [FK_CART_USER]
+GO
+
