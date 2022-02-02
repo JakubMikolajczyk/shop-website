@@ -59,6 +59,7 @@ class UserDatabase {
             let result =  res.recordset;
             result.map(user => {
                 user.id = user.id[0];
+                user.seed = BigInt(user.seed);
             })
             return result;
         }
@@ -452,13 +453,10 @@ class OrderDatabase {
         }
     }
 
-    async delete(order) {
-        if (!order || order.id === undefined) {
-            return false;
-        }
+    async delete(id) {
         try {
             let req = new mssql.Request(this.conn);
-            req.input("id", order.id);
+            req.input("id", id);
 
             let res = await req.query(`delete from [ORDER_CONTENT] where order_id=@id;
                                        delete from [ORDER] where id=@id`);
@@ -497,13 +495,13 @@ class CategoryDatabase {
     async read(category = {}) {
         try {
             let req = new mssql.Request(this.conn);
-            if ("id" in category) {
+            if (category.id !== undefined) {
                 req.input("id", category.id);
             }
-            if (category.name) {
+            if (category.name !== undefined) {
                 req.input("name", category.name);
             }
-            if (category.root_id) {
+            if (category.root_id !== undefined) {
                 req.input("root_id", category.root_id);
             }
 
@@ -528,14 +526,14 @@ class CategoryDatabase {
         try {
             let req = new mssql.Request(this.conn);
             req.input("name", category.name);
-            if ("root_id" in category) {
-                req.input("root_id", root_id);
+            if (category.root_id !== undefined) {
+                req.input("root_id", category.root_id);
             }
             else {
                 req.input("root_id", null);
             }
 
-            let res = req.query(`insert into [CATEGORY]
+            let res = await req.query(`insert into [CATEGORY]
                                  (name, root_id)
                                  values
                                  (@name, @root_id)`);
@@ -544,6 +542,65 @@ class CategoryDatabase {
         catch (err) {
             console.log(err);
             return false;
+        }
+    }
+
+    async update(category) {
+        if(!category || !("id" in category) || !("name" in category)) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("id", category.id);
+            req.input("name", category.name);
+            if ("root_id" in category) {
+                req.input("root_id", category.root_id);
+            }
+            else {
+                req.input("root_id", null);
+            }
+
+            let res = await req.query(`update [CATEGORY]
+                                       set
+                                       name=@name,
+                                       root_id=@root_id
+                                       where id=@id`);
+            return res.rowsAffected[0] != 0;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async delete(id) {
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("id", id);
+            
+            let res = await req.query(`delete from [CATEGORY] where id = @id`);
+            return true;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async getChildren(category) {
+        if(!category || !("id" in category)) {
+            return [];
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("id", category.id);
+            let res = await req.query(`select * from [CATEGORY]
+                                       where [CATEGORY].root_id=@id`);
+            return res.recordset;
+        }
+        catch (err) {
+            console.log(err);
+            return [];
         }
     }
 }
@@ -591,7 +648,8 @@ async function main() {
 
         let category = {
             id: 1,
-            name: "Drewno"
+            name: "Meble",
+            root_id: 1
         }
 
         let users = await userRepo.read();
@@ -609,6 +667,7 @@ async function main() {
             console.log(order);
         });
 
+        await categoryRepo.delete(7);
         let categories = await categoryRepo.read();
         categories.forEach(category => {
             console.log(category);
