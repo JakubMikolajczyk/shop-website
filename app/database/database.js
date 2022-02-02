@@ -65,7 +65,7 @@ class UserDatabase {
     }
 
     async add(user) {
-        if (!user) {
+        if (!user || !user.login || !user.password || !user.seed) {
             return false;
         }
         try {
@@ -81,7 +81,8 @@ class UserDatabase {
                                        `);
 
             let id = res.recordset[0].id;
-            return this.initUserTables(id);
+            user.id = id;
+            return true;
         }
         catch (err) {
             console.log(err);
@@ -89,25 +90,52 @@ class UserDatabase {
         }
     }
 
-    async initUserTables(id) {
+    async addDetails(user) {
+        if(!user || !user.id || !user.name || !user.surname || !user.phone || !user.mail) {
+            return false;
+        }
         try {
             let req = new mssql.Request(this.conn);
-            req.input("id", id);
-            let res = req.query(`insert into [USER_DETAILS]
-                                 (id)
-                                 values
-                                 (@id);
-                                 insert into [USER_ADDRESS]
-                                 (id)
-                                 values
-                                 (@id)`);
+            req.input("id", user.id);
+            req.input("name", user.name);
+            req.input("surname", user.surname);
+            req.input("phone", user.phone);
+            req.input("mail", user.mail);
+
+            let res = await req.query(`insert into [USER_DETAILS]
+                                       (id, name, surname, phone, mail)
+                                       values
+                                       (@id, @name, @surname, @phone, @mail)`
+                                       );
+        }
+        catch(err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async addAddress(user) {
+        if (!user || !user.id || !user.street || !user.number || !user.postal || !user.city) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("id", user.id);
+            req.input("street", user.street);
+            req.input("number", user.number);
+            req.input("postal", user.postal);
+            req.input("city", user.city);
+
+            let res = await req.query(`insert into [USER_ADDRESS]
+                                       (id, street, number, postal, city)
+                                       values
+                                       (@id, @street, @number, @postal, @city)`);
             return true;
         }
         catch (err) {
             console.log(err);
             return false;
         }
-
     }
 
     async updateDetails(user) {
@@ -182,6 +210,9 @@ class UserDatabase {
 }
 
 class ProductDatabase {
+    constructor(conn) {
+        this.conn = conn;
+    }
 
 }
 
@@ -198,13 +229,13 @@ async function main() {
             street: "Kwiatowa",
             number: "13B",
             postal: "53601",
-            city: "Warszwa",
+            city: "Wrocław",
             name: "Wiktor",
             surname: "Bukowski",
             mail: "w.bukowski",
             phone: "123456789"
         }
-        let res = await repo.updateDetails(user);
+        let res = await repo.updateAddress(user);
         console.log(res);
         let users = await repo.read();
         users.forEach(user => {
