@@ -56,7 +56,11 @@ class UserDatabase {
                                        (user.postal ? " AND [USER_DETAILS].postal = @postal" : "") +
                                        (user.city ? " AND [USER_DETAILS].city = @city" : "")
                                        );
-            return res.recordset;
+            let result =  res.recordset;
+            result.map(user => {
+                user.id = user.id[0];
+            })
+            return result;
         }
         catch (err) {
             console.log(err);
@@ -254,7 +258,13 @@ class ProductDatabase {
                                        (product.category_id ? " AND [CATEGORY].id = @category_id" : "") +
                                        (product.category ? " AND [CATEGORY].name = @category" : "")
                                        );
-            return res.recordset;
+            let result = res.recordset
+            result.map(product => {
+                product.id = product.id[0];
+                product.category = product.name[1];
+                product.name = product.name[0];
+            });
+            return result;
         }
         catch (err) {
             console.log(err);
@@ -273,7 +283,7 @@ class ProductDatabase {
                 return false;
         }
         try {
-            let req = mssql.Request(this.conn);
+            let req = new mssql.Request(this.conn);
             req.input("name", product.name);
             req.input("price", product.price);
             req.input("amount", product.amount);
@@ -281,7 +291,7 @@ class ProductDatabase {
             req.input("description", product.description);
             req.input("category_id", product.category_id);
 
-            let res = req.query(`insert into [PRODUCT]
+            let res = await req.query(`insert into [PRODUCT]
                                  (name, price, amount, img_path, description, category_id)
                                  values
                                  (@name, @price, @amount, @img_path, @description, @category_id)`);
@@ -479,6 +489,64 @@ class OrderDatabase {
     }
 }
 
+class CategoryDatabase {
+    constructor(conn) {
+        this.conn = conn;
+    }
+
+    async read(category = {}) {
+        try {
+            let req = new mssql.Request(this.conn);
+            if ("id" in category) {
+                req.input("id", category.id);
+            }
+            if (category.name) {
+                req.input("name", category.name);
+            }
+            if (category.root_id) {
+                req.input("root_id", category.root_id);
+            }
+
+            let res = await req.query(`select * from [CATEGORY]
+                                       where 1 = 1` +
+                                       ("id" in category ? " AND id = @id" : "") +
+                                       ("name" in category ? " AND name = @name" : "") +
+                                       ("root_id" in category ? " AND root_id = @root_id" : "")
+                                       );
+            return res.recordset;
+        }
+        catch (err) {
+            console.log(err);
+            return [];
+        }
+    }
+
+    async add(category) {
+        if (!category || !("name" in category)) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("name", category.name);
+            if ("root_id" in category) {
+                req.input("root_id", root_id);
+            }
+            else {
+                req.input("root_id", null);
+            }
+
+            let res = req.query(`insert into [CATEGORY]
+                                 (name, root_id)
+                                 values
+                                 (@name, @root_id)`);
+            return true;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+}
 
 async function main() {
     let conn = new mssql.ConnectionPool("server=localhost,1433;database=weppo;user id=admin;password=admin;trustServerCertificate=true")
@@ -487,6 +555,7 @@ async function main() {
         let userRepo = new UserDatabase(conn);
         let productRepo = new ProductDatabase(conn);
         let orderRepo = new OrderDatabase(conn);
+        let categoryRepo = new CategoryDatabase(conn);
 
         let user = {
             id: 2,
@@ -501,25 +570,50 @@ async function main() {
             surname: "Bukowski",
             mail: "w.bukowski",
             phone: "123456789"
-        }
+        };
+
+        let product = {
+            id: 1,
+            name: "Deska",
+            price: 100,
+            amount: 1000,
+            img_path: "/path",
+            description: "Zwykła deska.",
+            category_id: 1
+        };
+
         let order = {
             id: 2,
             user_id: 2,
             date: new Date(),
             status: 0
+        };
+
+        let category = {
+            id: 1,
+            name: "Drewno"
         }
-        //let res = await repo.updateAddress(user);
-        //console.log(res);
-        // let users = await userRepo.read();
-        // users.forEach(user => {
-        //     console.log(user);
-        // });
-        let res = await orderRepo.delete(order);
-        console.log(res);
+
+        let users = await userRepo.read();
+        users.forEach(user => {
+            console.log(user);
+        });
+
+        let products = await productRepo.read();
+        products.forEach(product => {
+            console.log(product);
+        });
+
         let orders = await orderRepo.read();
         orders.forEach(order => {
             console.log(order);
-        })
+        });
+
+        let categories = await categoryRepo.read();
+        categories.forEach(category => {
+            console.log(category);
+        });
+
         conn.close();
     }
     catch (err) {
