@@ -12,7 +12,7 @@ class UserDatabase {
                 req.input("id", user.id);
             }
             if (user.login) {
-                req.input("login", login);
+                req.input("login", user.login);
             }
 
             if (user.name) {
@@ -91,7 +91,7 @@ class UserDatabase {
     }
 
     async addDetails(user) {
-        if(!user || !user.id || !user.name || !user.surname || !user.phone || !user.mail) {
+        if (!user || !user.id || !user.name || !user.surname || !user.phone || !user.mail) {
             return false;
         }
         try {
@@ -106,9 +106,9 @@ class UserDatabase {
                                        (id, name, surname, phone, mail)
                                        values
                                        (@id, @name, @surname, @phone, @mail)`
-                                       );
+            );
         }
-        catch(err) {
+        catch (err) {
             console.log(err);
             return false;
         }
@@ -199,7 +199,7 @@ class UserDatabase {
             let res = await req.query(`delete from [USER_DETAILS] where id=@id;
                                        delete from [USER_ADDRESS] where id=@id;
                                        delete from [USER] where id=@id`);
-                                       // czy na pewno?
+            // czy na pewno?
         }
         catch (err) {
             console.log(err);
@@ -214,7 +214,115 @@ class ProductDatabase {
         this.conn = conn;
     }
 
+    async read(product = {}) {
+        try {
+            let req = new mssql.Request(this.conn);
+            if (product.id) {
+                req.input("id", product.id);
+            }
+            if (product.name) {
+                req.input("name", product.name);
+            }
+            if (product.price) {
+                req.input("price", product.price);
+            }
+            if (product.amount) {
+                req.input("amount", product.amount);
+            }
+            if (product.img_path) {
+                req.input("img_path", product.img_path);
+            }
+            if (product.description) {
+                req.input("description", product.description);
+            }
+            if (product.category_id) {
+                req.input("category_id", product.category_id);
+            }
+            if (product.category) {
+                req.input("category", product.category);
+            }
+
+            let res = await req.query(`select * from [PRODUCT] 
+                                       join [CATEGORY] on [PRODUCT].category_id = [CATEGORY].id
+                                       where 1 = 1` +
+                (product.id ? " AND [PRODUCT].id = @id" : "") +
+                (product.name ? " AND [PRODUCT].name = @name" : "") +
+                (product.price ? " AND [PRODUCT].price = @price" : "") +
+                (product.amount ? " AND [PRODUCT].amount = @amount" : "") +
+                (product.img_path ? " AND [PRODUCT].img_path = @img_path" : "") +
+                //(product.description ? " AND [PRODUCT].description = @description" : "") +
+                (product.category_id ? " AND [CATEGORY].id = @category_id" : "") +
+                (product.category ? " AND [CATEGORY].name = @category" : "")
+            );
+            return res.recordset;
+        }
+        catch (err) {
+            console.log(err);
+            return [];
+        }
+    }
+
+    async add(product) {
+        if (!product || !product.name || !product.price || !product.amount || !product.img_path || !product.description || !product.category_id) {
+            return false;
+        }
+        try {
+            let req = mssql.Request(this.conn);
+            req.input("name", product.name);
+            req.input("price", product.price);
+            req.input("amount", product.amount);
+            req.input("img_path", product.img_path);
+            req.input("description", product.description);
+            req.input("category_id", product.category_id);
+
+            let res = req.query(`insert into [PRODUCT]
+                                 (name, price, amount, img_path, description, category_id)
+                                 values
+                                 (@name, @price, @amount, @img_path, @description, @category_id)`);
+            return res.rowsAffected[0] != 0;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async update(product) {
+        if (!product || !product.id || !product.name || !product.price || !product.amount || !product.img_path || !product.description || !product.category_id) {
+            return false;
+        }
+        try {
+            let req = mssql.Request(this.conn);
+            req.input("id", product.id);
+            req.input("name", product.name);
+            req.input("price", product.price);
+            req.input("amount", product.amount);
+            req.input("img_path", product.img_path);
+            req.input("description", product.description);
+            req.input("category_id", product.category_id);
+
+            let res = req.query(`update [PRODUCT]
+                                 set
+                                 name=@name,
+                                 price=@price,
+                                 amount=@amount,
+                                 img_path=@img_path,
+                                 description=@description,
+                                 category_id=@category_id`);
+            return res.rowsAffected[0] != 0;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async delete(product) {
+        //todo
+    }
 }
+
+
 
 async function main() {
     let conn = new mssql.ConnectionPool("server=localhost,1433;database=weppo;user id=admin;password=admin;trustServerCertificate=true")
