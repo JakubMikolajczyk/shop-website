@@ -45,17 +45,17 @@ class UserDatabase {
                                        join [USER_DETAILS] on [USER].id = [USER_DETAILS].id
                                        join [USER_ADDRESS] on [USER].id = [USER_ADDRESS].id
                                        where 1 = 1` +
-                (user.id ? " AND [USER].id = @id" : "") +
-                (user.login ? " AND [USER].login = @login" : "") +
-                (user.name ? " AND [USER_DETAILS].name = @name" : "") +
-                (user.surname ? " AND [USER_DETAILS].surname = @surname" : "") +
-                (user.phone ? " AND [USER_DETAILS].phone = @phone" : "") +
-                (user.mail ? " AND [USER_DETAILS].mail = @mail" : "") +
-                (user.street ? " AND [USER_DETAILS].street = @street" : "") +
-                (user.number ? " AND [USER_DETAILS].number = @number" : "") +
-                (user.postal ? " AND [USER_DETAILS].postal = @postal" : "") +
-                (user.city ? " AND [USER_DETAILS].city = @city" : "")
-            );
+                                       (user.id ? " AND [USER].id = @id" : "") +
+                                       (user.login ? " AND [USER].login = @login" : "") +
+                                       (user.name ? " AND [USER_DETAILS].name = @name" : "") +
+                                       (user.surname ? " AND [USER_DETAILS].surname = @surname" : "") +
+                                       (user.phone ? " AND [USER_DETAILS].phone = @phone" : "") +
+                                       (user.mail ? " AND [USER_DETAILS].mail = @mail" : "") +
+                                       (user.street ? " AND [USER_DETAILS].street = @street" : "") +
+                                       (user.number ? " AND [USER_DETAILS].number = @number" : "") +
+                                       (user.postal ? " AND [USER_DETAILS].postal = @postal" : "") +
+                                       (user.city ? " AND [USER_DETAILS].city = @city" : "")
+                                       );
             return res.recordset;
         }
         catch (err) {
@@ -199,7 +199,7 @@ class UserDatabase {
             let res = await req.query(`delete from [USER_DETAILS] where id=@id;
                                        delete from [USER_ADDRESS] where id=@id;
                                        delete from [USER] where id=@id`);
-            // czy na pewno?
+            return true;
         }
         catch (err) {
             console.log(err);
@@ -245,15 +245,15 @@ class ProductDatabase {
             let res = await req.query(`select * from [PRODUCT] 
                                        join [CATEGORY] on [PRODUCT].category_id = [CATEGORY].id
                                        where 1 = 1` +
-                (product.id ? " AND [PRODUCT].id = @id" : "") +
-                (product.name ? " AND [PRODUCT].name = @name" : "") +
-                (product.price ? " AND [PRODUCT].price = @price" : "") +
-                (product.amount ? " AND [PRODUCT].amount = @amount" : "") +
-                (product.img_path ? " AND [PRODUCT].img_path = @img_path" : "") +
-                //(product.description ? " AND [PRODUCT].description = @description" : "") +
-                (product.category_id ? " AND [CATEGORY].id = @category_id" : "") +
-                (product.category ? " AND [CATEGORY].name = @category" : "")
-            );
+                                       (product.id ? " AND [PRODUCT].id = @id" : "") +
+                                       (product.name ? " AND [PRODUCT].name = @name" : "") +
+                                       (product.price ? " AND [PRODUCT].price = @price" : "") +
+                                       (product.amount ? " AND [PRODUCT].amount = @amount" : "") +
+                                       (product.img_path ? " AND [PRODUCT].img_path = @img_path" : "") +
+                                       //(product.description ? " AND [PRODUCT].description = @description" : "") +
+                                       (product.category_id ? " AND [CATEGORY].id = @category_id" : "") +
+                                       (product.category ? " AND [CATEGORY].name = @category" : "")
+                                       );
             return res.recordset;
         }
         catch (err) {
@@ -263,8 +263,14 @@ class ProductDatabase {
     }
 
     async add(product) {
-        if (!product || !product.name || !product.price || !product.amount || !product.img_path || !product.description || !product.category_id) {
-            return false;
+        if (!product || 
+            product.name === undefined || 
+            product.price === undefined || 
+            product.amount === undefined || 
+            product.img_path === undefined || 
+            product.description === undefined || 
+            product.category_id === undefined) {
+                return false;
         }
         try {
             let req = mssql.Request(this.conn);
@@ -288,8 +294,15 @@ class ProductDatabase {
     }
 
     async update(product) {
-        if (!product || !product.id || !product.name || !product.price || !product.amount || !product.img_path || !product.description || !product.category_id) {
-            return false;
+        if (!product || 
+            product.id === undefined ||
+            product.name === undefined || 
+            product.price === undefined || 
+            product.amount === undefined || 
+            product.img_path === undefined || 
+            product.description === undefined || 
+            product.category_id === undefined) {
+                return false;
         }
         try {
             let req = mssql.Request(this.conn);
@@ -308,7 +321,8 @@ class ProductDatabase {
                                  amount=@amount,
                                  img_path=@img_path,
                                  description=@description,
-                                 category_id=@category_id`);
+                                 category_id=@category_id
+                                 where id=@id`);
             return res.rowsAffected[0] != 0;
         }
         catch (err) {
@@ -322,13 +336,158 @@ class ProductDatabase {
     }
 }
 
+class OrderDatabase {
+    constructor(conn) {
+        this.conn = conn;
+    }
+
+    async read(order = {}) {
+        try {
+            let req = new mssql.Request(this.conn);
+            if (order.id) {
+                req.input("id", order.id);
+            }
+            if (order.user_id) {
+                req.input("user_id", order.user_id);
+            }
+            if (order.date) {
+                let d = new Date();
+                if (order.date.year) {
+                    req.input("year", order.date.year);
+                }
+                if (order.date.month) {
+                    req.input("month", order.date.month);
+                }
+                if (order.date.day) {
+                    req.input("day", order.date.day);
+                }
+                if (order.date.hours) {
+                    req.input("hours", order.date.hours);
+                }
+                if (order.date.minutes) {
+                    req.input("minutes", order.date.minutes);
+                }
+                if (order.date.seconds) {
+                    req.input("seconds", order.date.seconds);
+                }
+            }
+            if (order.status) {
+                req.input("status", order.status);
+            }
+
+            let res = await req.query(`select * from [ORDER]
+                                       where 1 = 1` +
+                                       (order.id ? " AND [ORDER].id=@id" : "") +
+                                       (order.user_id ? " AND [ORDER].user_id=@user_id" : "") +
+                                        //  (order.date ? ` AND YEAR([ORDER].date)=@year
+                                        //                  AND MONTH()` : "") +
+                                        (order.status ? " AND [ORDER].status=@status" : "")
+                                        );
+            return res.recordset;
+        }
+        catch (err) {
+            console.log(err);
+            return [];
+        }
+    }
+
+    async add(order) {
+        function dateToSQL(date) {
+            return date.toISOString().slice(0, 19).replace('T', ' ');
+        }
+
+        if (!order || order.user_id === undefined || order.date === undefined || order.status === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("user_id", order.user_id);
+            req.input("date", dateToSQL(order.date));
+            req.input("status", order.status);
+
+            let res = await req.query(`insert into [ORDER]
+                                       (user_id, date, status)
+                                       values
+                                       (@user_id, @date, @status)`);
+            return res.rowsAffected[0] != 0;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async update(order) {
+        if (!order || order.id === undefined || order.user_id === undefined || order.date === undefined || order.status === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("id", order.id);
+            req.input("user_id", order.user_id);
+            req.input("date", dateToSQL(order.date));
+            req.input("status", order.status);
+
+            let res = await req.query(`update [ORDER]
+                                 set
+                                 user_id=@user_id,
+                                 date=@date,
+                                 status=@status
+                                 where id=@id`);
+            return res.rowsAffected[0] != 0;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async delete(order) {
+        if (!order || order.id === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("id", order.id);
+
+            let res = await req.query(`delete from [ORDER_CONTENT] where order_id=@id;
+                                       delete from [ORDER] where id=@id`);
+            return true;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async getContent(order) {
+        if (!order || order.id === undefined) {
+            return [];
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("id", order.id);
+
+            let res = await req.query(`select * from [ORDER_CONTENT]
+                                       where id=@id`);
+            return res.recordset;
+        }
+        catch (err) {
+            console.log(err);
+            return [];
+        }
+    }
+}
 
 
 async function main() {
     let conn = new mssql.ConnectionPool("server=localhost,1433;database=weppo;user id=admin;password=admin;trustServerCertificate=true")
     try {
         await conn.connect();
-        let repo = new UserDatabase(conn);
+        let userRepo = new UserDatabase(conn);
+        let productRepo = new ProductDatabase(conn);
+        let orderRepo = new OrderDatabase(conn);
+
         let user = {
             id: 2,
             login: "qwerty",
@@ -343,12 +502,24 @@ async function main() {
             mail: "w.bukowski",
             phone: "123456789"
         }
-        let res = await repo.updateAddress(user);
+        let order = {
+            id: 2,
+            user_id: 2,
+            date: new Date(),
+            status: 0
+        }
+        //let res = await repo.updateAddress(user);
+        //console.log(res);
+        // let users = await userRepo.read();
+        // users.forEach(user => {
+        //     console.log(user);
+        // });
+        let res = await orderRepo.delete(order);
         console.log(res);
-        let users = await repo.read();
-        users.forEach(user => {
-            console.log(user);
-        });
+        let orders = await orderRepo.read();
+        orders.forEach(order => {
+            console.log(order);
+        })
         conn.close();
     }
     catch (err) {
