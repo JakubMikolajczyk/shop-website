@@ -1,4 +1,5 @@
 const mssql = require("mssql");
+const fs = require("fs");
 
 class UserDatabase {
     constructor(conn) {
@@ -606,7 +607,8 @@ class CategoryDatabase {
 }
 
 async function main() {
-    let conn = new mssql.ConnectionPool("server=localhost,1433;database=weppo;user id=admin;password=admin;trustServerCertificate=true")
+    let connectionString = await fs.promises.readFile("./connection-string.txt", "utf-8"); 
+    let conn = new mssql.ConnectionPool(connectionString);
     try {
         await conn.connect();
         let userRepo = new UserDatabase(conn);
