@@ -9,36 +9,36 @@ class UserDatabase {
     async read(user = {}) {
         try {
             let req = new mssql.Request(this.conn);
-            if (user.id) {
+            if (user.id !== undefined) {
                 req.input("id", user.id);
             }
-            if (user.login) {
+            if (user.login !== undefined) {
                 req.input("login", user.login);
             }
 
-            if (user.name) {
+            if (user.name !== undefined) {
                 req.input("name", user.name);
             }
-            if (user.surname) {
+            if (user.surname !== undefined) {
                 req.input("surname", user.surname);
             }
-            if (user.phone) {
+            if (user.phone !== undefined) {
                 req.input("phone", user.phone);
             }
-            if (user.mail) {
+            if (user.mail !== undefined) {
                 req.input("mail", user.mail);
             }
 
-            if (user.street) {
+            if (user.street !== undefined) {
                 req.input("street", user.street);
             }
-            if (user.number) {
+            if (user.number !== undefined) {
                 req.input("number", user.number);
             }
-            if (user.postal) {
+            if (user.postal !== undefined) {
                 req.input("postal", user.postal);
             }
-            if (user.city) {
+            if (user.city !== undefined) {
                 req.input("city", user.city);
             }
 
@@ -223,28 +223,28 @@ class ProductDatabase {
     async read(product = {}) {
         try {
             let req = new mssql.Request(this.conn);
-            if (product.id) {
+            if (product.id !== undefined) {
                 req.input("id", product.id);
             }
-            if (product.name) {
+            if (product.name !== undefined) {
                 req.input("name", product.name);
             }
-            if (product.price) {
+            if (product.price !== undefined) {
                 req.input("price", product.price);
             }
-            if (product.amount) {
+            if (product.amount !== undefined) {
                 req.input("amount", product.amount);
             }
-            if (product.img_path) {
+            if (product.img_path !== undefined) {
                 req.input("img_path", product.img_path);
             }
-            if (product.description) {
+            if (product.description !== undefined) {
                 req.input("description", product.description);
             }
-            if (product.category_id) {
+            if (product.category_id !== undefined) {
                 req.input("category_id", product.category_id);
             }
-            if (product.category) {
+            if (product.category !== undefined) {
                 req.input("category", product.category);
             }
 
@@ -356,34 +356,16 @@ class OrderDatabase {
     async read(order = {}) {
         try {
             let req = new mssql.Request(this.conn);
-            if (order.id) {
+            if (order.id !== undefined) {
                 req.input("id", order.id);
             }
-            if (order.user_id) {
+            if (order.user_id !== undefined) {
                 req.input("user_id", order.user_id);
             }
-            if (order.date) {
-                let d = new Date();
-                if (order.date.year) {
-                    req.input("year", order.date.year);
-                }
-                if (order.date.month) {
-                    req.input("month", order.date.month);
-                }
-                if (order.date.day) {
-                    req.input("day", order.date.day);
-                }
-                if (order.date.hours) {
-                    req.input("hours", order.date.hours);
-                }
-                if (order.date.minutes) {
-                    req.input("minutes", order.date.minutes);
-                }
-                if (order.date.seconds) {
-                    req.input("seconds", order.date.seconds);
-                }
+            if (order.date !== undefined) {
+                // todo
             }
-            if (order.status) {
+            if (order.status !== undefined) {
                 req.input("status", order.status);
             }
 
@@ -521,7 +503,7 @@ class CategoryDatabase {
     }
 
     async add(category) {
-        if (!category || !("name" in category)) {
+        if (!category || category.name === undefined) {
             return false;
         }
         try {
@@ -547,14 +529,14 @@ class CategoryDatabase {
     }
 
     async update(category) {
-        if(!category || !("id" in category) || !("name" in category)) {
+        if(!category || category.id === undefined || category.name === undefined) {
             return false;
         }
         try {
             let req = new mssql.Request(this.conn);
             req.input("id", category.id);
             req.input("name", category.name);
-            if ("root_id" in category) {
+            if (category.root_id !== undefined) {
                 req.input("root_id", category.root_id);
             }
             else {
@@ -589,7 +571,7 @@ class CategoryDatabase {
     }
 
     async getChildren(category) {
-        if(!category || !("id" in category)) {
+        if(!category || category.id === undefined) {
             return [];
         }
         try {
@@ -618,9 +600,9 @@ async function main() {
 
         let user = {
             id: 2,
-            login: "qwerty",
-            password: "admin",
-            seed: 1234,
+            login: "user",
+            password: "user",
+            seed: 2222,
             street: "Kwiatowa",
             number: "13B",
             postal: "53601",
@@ -653,7 +635,7 @@ async function main() {
             name: "Meble",
             root_id: 1
         }
-
+        
         let users = await userRepo.read();
         users.forEach(user => {
             console.log(user);
