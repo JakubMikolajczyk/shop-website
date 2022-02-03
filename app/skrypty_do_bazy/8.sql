@@ -1,7 +1,7 @@
 USE [weppo]
 GO
 
-/****** Object:  Table [dbo].[CART]    Script Date: 01.02.2022 20:21:35 ******/
+/****** Object:  Table [dbo].[CART]    Script Date: 03.02.2022 14:40:03 ******/
 SET ANSI_NULLS ON
 GO
 

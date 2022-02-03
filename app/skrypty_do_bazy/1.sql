@@ -1,7 +1,7 @@
 USE [master]
 GO
 
-/****** Object:  Database [weppo]    Script Date: 01.02.2022 20:18:41 ******/
+/****** Object:  Database [weppo]    Script Date: 03.02.2022 14:38:00 ******/
 CREATE DATABASE [weppo]
  CONTAINMENT = NONE
  ON  PRIMARY 

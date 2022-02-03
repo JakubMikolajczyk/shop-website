@@ -1,7 +1,7 @@
 USE [weppo]
 GO
 
-/****** Object:  Table [dbo].[FAVOURITE]    Script Date: 01.02.2022 20:21:47 ******/
+/****** Object:  Table [dbo].[FAVOURITE]    Script Date: 03.02.2022 14:40:14 ******/
 SET ANSI_NULLS ON
 GO
 

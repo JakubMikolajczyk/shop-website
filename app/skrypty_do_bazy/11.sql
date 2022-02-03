@@ -1,7 +1,7 @@
 USE [weppo]
 GO
 
-/****** Object:  Table [dbo].[ORDER_CONTENT]    Script Date: 01.02.2022 20:22:13 ******/
+/****** Object:  Table [dbo].[ORDER_CONTENT]    Script Date: 03.02.2022 14:40:36 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -9,7 +9,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 CREATE TABLE [dbo].[ORDER_CONTENT](
-	[order_id] [int] NULL,
+	[order_id] [int] NOT NULL,
 	[product_id] [int] NULL,
 	[amount] [int] NULL
 ) ON [PRIMARY]
