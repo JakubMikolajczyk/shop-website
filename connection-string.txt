@@ -1,0 +1,1 @@
+server=localhost,1433;database=weppo;user id=admin;password=admin;trustServerCertificate=true
