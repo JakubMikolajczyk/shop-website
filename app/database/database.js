@@ -46,16 +46,16 @@ class UserDatabase {
                                        join [USER_DETAILS] on [USER].id = [USER_DETAILS].id
                                        join [USER_ADDRESS] on [USER].id = [USER_ADDRESS].id
                                        where 1 = 1` +
-                                       (user.id ? " AND [USER].id = @id" : "") +
-                                       (user.login ? " AND [USER].login = @login" : "") +
-                                       (user.name ? " AND [USER_DETAILS].name = @name" : "") +
-                                       (user.surname ? " AND [USER_DETAILS].surname = @surname" : "") +
-                                       (user.phone ? " AND [USER_DETAILS].phone = @phone" : "") +
-                                       (user.mail ? " AND [USER_DETAILS].mail = @mail" : "") +
-                                       (user.street ? " AND [USER_DETAILS].street = @street" : "") +
-                                       (user.number ? " AND [USER_DETAILS].number = @number" : "") +
-                                       (user.postal ? " AND [USER_DETAILS].postal = @postal" : "") +
-                                       (user.city ? " AND [USER_DETAILS].city = @city" : "")
+                                       (user.id !== undefined       ? " AND [USER].id = @id"                    : "") +
+                                       (user.login !== undefined    ? " AND [USER].login = @login"              : "") +
+                                       (user.name !== undefined     ? " AND [USER_DETAILS].name = @name"        : "") +
+                                       (user.surname !== undefined  ? " AND [USER_DETAILS].surname = @surname"  : "") +
+                                       (user.phone !== undefined    ? " AND [USER_DETAILS].phone = @phone"      : "") +
+                                       (user.mail !== undefined     ? " AND [USER_DETAILS].mail = @mail"        : "") +
+                                       (user.street !== undefined   ? " AND [USER_DETAILS].street = @street"    : "") +
+                                       (user.number !== undefined   ? " AND [USER_DETAILS].number = @number"    : "") +
+                                       (user.postal !== undefined   ? " AND [USER_DETAILS].postal = @postal"    : "") +
+                                       (user.city !== undefined     ? " AND [USER_DETAILS].city = @city"        : "")
                                        );
             let result =  res.recordset;
             result.map(user => {
@@ -211,6 +211,10 @@ class UserDatabase {
             console.log(err);
             return false;
         }
+    }
+
+    async advancedSearch(user, product, order) {
+
     }
 
 }
@@ -584,6 +588,171 @@ class CategoryDatabase {
         catch (err) {
             console.log(err);
             return [];
+        }
+    }
+}
+
+class CartDatabase {
+    constructor(conn) {
+        this.conn = conn;
+    }
+
+    async read(cart = {}) {
+        try {
+            let req = new mssql.Request(this.conn);
+            if (cart.user_id !== undefined) {
+                req.input("user_id", cart.user_id);
+            }
+            if (cart.product_id !== undefined) {
+                req.input("product_id", cart.product_id);
+            }
+            if (cart.amount !== undefined) {
+                req.input("amount", cart.amount);
+            }
+
+            let res = await req.query(`select * from [CART]
+                                       where 1 = 1` +
+                                       (cart.user_id    !== undefined ? " AND user_id = @user_id"       : "") +
+                                       (cart.product_id !== undefined ? " AND product_id = @product_id" : "") +
+                                       (cart.amount     !== undefined ? " AND amount = @amount"         : "")
+                                       );
+            return res.recordset;
+        }
+        catch (err) {
+            console.log(err);
+            return [];
+        }
+    }
+
+    async add(cartElement) {
+        if(!cartElement || cartElement.user_id === undefined || cartElement.product_id === undefined || cartElement.amount === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("user_id", cartElement.user_id);
+            req.input("product_id", cartElement.product_id);
+            req.input("amount", cartElement.amount);
+
+            let res = await req.query(`insert into [CART]
+                                       (user_id, product_id, amount)
+                                       values
+                                       (@user_id, @product_id, @amount)`);
+            return true;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async update(cartElement) {
+        if(!cartElement || cartElement.user_id === undefined || cartElement.product_id === undefined || cartElement.amount === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("user_id", cartElement.user_id);
+            req.input("product_id", cartElement.product_id);
+            req.input("amount", cartElement.amount);
+
+            let res = await req.query(`update [CART]
+                                       set
+                                       amount = @amount
+                                       where user_id = @user_id AND product_id = @product_id`);
+            return res.rowsAffected[0] != 0;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async remove(cartElement) {
+        if(!cartElement || cartElement.user_id === undefined || cartElement.product_id === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("user_id", cartElement.user_id);
+            req.input("product_id", cartElement.product_id);
+
+            let res = await req.query(`delete from [CART]
+                                       where user_id = @user_id AND product_id = @product_id`);
+            return res.rowsAffected[0] != 0;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+}
+
+class FavouriteDatabase {
+    constructor(conn) {
+        this.conn = conn;
+    }
+
+    async read(favourite = {}) {
+        try {
+            let req = new mssql.Request(this.conn);
+            if (favourite.user_id !== undefined) {
+                req.input("user_id", favourite.user_id);
+            }
+            if (favourite.product_id !== undefined) {
+                req.input("product_id", favourite.product_id);
+            }
+
+            let res = req.query(`select * from [FAVOURITE]
+                                 where 1 = 1` +
+                                 (favourite.user_id !== undefined       ? " AND user_id = @user_id"         : "") +
+                                 (favourite.product_id !== undefined    ? " AND product_id = @product_id"   : "")
+                                 );
+            return (await res).recordset;
+        }
+        catch (err) {
+            console.log(err);
+            return [];
+        }
+    }
+
+    async add(favourite) {
+        if(!favourite || favourite.user_id === undefined || favourite.product_id === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("user_id", favourite.user_id);
+            req.input("product_id", favourite.product_id);
+
+            let res = await req.query(`insert into [FAVOURITE]
+                                       (user_id, product_id)
+                                       values
+                                       (@user_id, @product_id)`);
+            return true;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async remove(favourite) {
+        if(!favourite || favourite.user_id === undefined || favourite.product_id === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("user_id", favourite.user_id);
+            req.input("product_id", favourite.product_id);
+
+            let res = await req.query(`delete from [FAVOURITE]
+                                       where user_id = @user_id AND product_id = @product_id)`);
+            return true;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
         }
     }
 }
