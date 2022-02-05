@@ -15,6 +15,10 @@ class UserDatabase {
             if (user.login !== undefined) {
                 req.input("login", user.login);
             }
+            if (user.valid !== undefined) {
+                req.input("valid", user.valid ? 1 : 0);
+            }
+
 
             if (user.name !== undefined) {
                 req.input("name", user.name);
@@ -41,21 +45,22 @@ class UserDatabase {
             if (user.city !== undefined) {
                 req.input("city", user.city);
             }
-
+            
             let res = await req.query(`select * from [USER]
-                                       join [USER_DETAILS] on [USER].id = [USER_DETAILS].id
-                                       join [USER_ADDRESS] on [USER].id = [USER_ADDRESS].id
+                                       left join [USER_DETAILS] on [USER].id = [USER_DETAILS].id
+                                       left join [USER_ADDRESS] on [USER].id = [USER_ADDRESS].id
                                        where 1 = 1` +
-                                       (user.id ? " AND [USER].id = @id" : "") +
-                                       (user.login ? " AND [USER].login = @login" : "") +
-                                       (user.name ? " AND [USER_DETAILS].name = @name" : "") +
-                                       (user.surname ? " AND [USER_DETAILS].surname = @surname" : "") +
-                                       (user.phone ? " AND [USER_DETAILS].phone = @phone" : "") +
-                                       (user.mail ? " AND [USER_DETAILS].mail = @mail" : "") +
-                                       (user.street ? " AND [USER_DETAILS].street = @street" : "") +
-                                       (user.number ? " AND [USER_DETAILS].number = @number" : "") +
-                                       (user.postal ? " AND [USER_DETAILS].postal = @postal" : "") +
-                                       (user.city ? " AND [USER_DETAILS].city = @city" : "")
+                                       (user.id !== undefined       ? " AND [USER].id = @id"                    : "") +
+                                       (user.login !== undefined    ? " AND [USER].login = @login"              : "") +
+                                       (user.valid !== undefined    ? " AND [USER].valid = @valid"              : "") +
+                                       (user.name !== undefined     ? " AND [USER_DETAILS].name = @name"        : "") +
+                                       (user.surname !== undefined  ? " AND [USER_DETAILS].surname = @surname"  : "") +
+                                       (user.phone !== undefined    ? " AND [USER_DETAILS].phone = @phone"      : "") +
+                                       (user.mail !== undefined     ? " AND [USER_DETAILS].mail = @mail"        : "") +
+                                       (user.street !== undefined   ? " AND [USER_DETAILS].street = @street"    : "") +
+                                       (user.number !== undefined   ? " AND [USER_DETAILS].number = @number"    : "") +
+                                       (user.postal !== undefined   ? " AND [USER_DETAILS].postal = @postal"    : "") +
+                                       (user.city !== undefined     ? " AND [USER_DETAILS].city = @city"        : "")
                                        );
             let result =  res.recordset;
             result.map(user => {
@@ -71,7 +76,7 @@ class UserDatabase {
     }
 
     async add(user) {
-        if (!user || !user.login || !user.password || !user.seed) {
+        if (!user || user.login === undefined || user.password === undefined || user.seed === undefined || user.isAdmin === undefined) {
             return false;
         }
         try {
@@ -79,10 +84,11 @@ class UserDatabase {
             req.input("login", user.login);
             req.input("password", user.password);
             req.input("seed", user.seed);
+            req.input("isAdmin", user.isAdmin ? 1 : 0);
             let res = await req.query(`insert into [USER]
-                                       (login, password, seed)
+                                       (login, password, seed, isAdmin, valid)
                                        values
-                                       (@login, @password, @seed)
+                                       (@login, @password, @seed, @isAdmin, 1)
                                        select scope_identity() as id;
                                        `);
 
@@ -97,7 +103,7 @@ class UserDatabase {
     }
 
     async addDetails(user) {
-        if (!user || !user.id || !user.name || !user.surname || !user.phone || !user.mail) {
+        if (!user || user.id === undefined || user.name === undefined || user.surname === undefined || user.phone === undefined || user.mail === undefined) {
             return false;
         }
         try {
@@ -121,7 +127,7 @@ class UserDatabase {
     }
 
     async addAddress(user) {
-        if (!user || !user.id || !user.street || !user.number || !user.postal || !user.city) {
+        if (!user || user.id === undefined || user.street === undefined || user.number === undefined || user.postal === undefined || user.city === undefined) {
             return false;
         }
         try {
@@ -145,7 +151,7 @@ class UserDatabase {
     }
 
     async updateDetails(user) {
-        if (!user || !user.id || !user.name || !user.surname || !user.phone || !user.mail) {
+        if (!user || user.id === undefined || user.name === undefined || user.surname === undefined || user.phone === undefined || user.mail === undefined) {
             return false;
         }
         try {
@@ -172,7 +178,7 @@ class UserDatabase {
     }
 
     async updateAddress(user) {
-        if (!user || !user.id || !user.street || !user.number || !user.postal || !user.city) {
+        if (!user || user.id === undefined || user.street === undefined || user.number === undefined || user.postal === undefined || user.city === undefined) {
             return false;
         }
         try {
@@ -202,9 +208,10 @@ class UserDatabase {
         try {
             let req = new mssql.Request(this.conn);
             req.input("id", id);
-            let res = await req.query(`delete from [USER_DETAILS] where id=@id;
-                                       delete from [USER_ADDRESS] where id=@id;
-                                       delete from [USER] where id=@id`);
+            let res = await req.query(`update [USER]
+                                       set 
+                                       valid = 0
+                                       where id = @id`);
             return true;
         }
         catch (err) {
@@ -247,18 +254,22 @@ class ProductDatabase {
             if (product.category !== undefined) {
                 req.input("category", product.category);
             }
+            if (product.valid !== undefined) {
+                req.input("valid", product.valid ? 1 : 0);
+            }
 
             let res = await req.query(`select * from [PRODUCT] 
                                        join [CATEGORY] on [PRODUCT].category_id = [CATEGORY].id
                                        where 1 = 1` +
-                                       (product.id ? " AND [PRODUCT].id = @id" : "") +
-                                       (product.name ? " AND [PRODUCT].name = @name" : "") +
-                                       (product.price ? " AND [PRODUCT].price = @price" : "") +
-                                       (product.amount ? " AND [PRODUCT].amount = @amount" : "") +
-                                       (product.img_path ? " AND [PRODUCT].img_path = @img_path" : "") +
+                                       (product.id !== undefined ? " AND [PRODUCT].id = @id" : "") +
+                                       (product.name !== undefined ? " AND [PRODUCT].name = @name" : "") +
+                                       (product.price !== undefined ? " AND [PRODUCT].price = @price" : "") +
+                                       (product.amount !== undefined ? " AND [PRODUCT].amount = @amount" : "") +
+                                       (product.img_path !== undefined ? " AND [PRODUCT].img_path = @img_path" : "") +
                                        //(product.description ? " AND [PRODUCT].description = @description" : "") +
-                                       (product.category_id ? " AND [CATEGORY].id = @category_id" : "") +
-                                       (product.category ? " AND [CATEGORY].name = @category" : "")
+                                       (product.category_id !== undefined ? " AND [CATEGORY].id = @category_id" : "") +
+                                       (product.category !== undefined ? " AND [CATEGORY].name = @category" : "") + 
+                                       (product.valid !== undefined ? " AND [PRODUCT].valid = @valid" : "")
                                        );
             let result = res.recordset
             result.map(product => {
@@ -294,9 +305,9 @@ class ProductDatabase {
             req.input("category_id", product.category_id);
 
             let res = await req.query(`insert into [PRODUCT]
-                                 (name, price, amount, img_path, description, category_id)
+                                 (name, price, amount, img_path, description, category_id, valid)
                                  values
-                                 (@name, @price, @amount, @img_path, @description, @category_id)`);
+                                 (@name, @price, @amount, @img_path, @description, @category_id, 1)`);
             return res.rowsAffected[0] != 0;
         }
         catch (err) {
@@ -343,8 +354,42 @@ class ProductDatabase {
         }
     }
 
-    async delete(product) {
-        //todo
+    async delete(id) {
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("id", id);
+            let res = await req.query(`update [PRODUCT]
+                                       set 
+                                       valid=0
+                                       where id=@id`);
+            return true;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async getByTags(tags, applyAND = false) {
+        try {
+            let req = new mssql.Request(this.conn);
+            let query = `select * from [PRODUCT]
+                         join [PRODUCT_TAGS] on [PRODUCT].id = [PRODUCT_TAGS].product_id
+                         where ${applyAND ? 1 : 0} = 1`;
+            
+            let operator = applyAND ? "AND" : "OR";
+            for(let i = 0; i < tags.length; i++) {
+                req.input("@" + i, tags[i]);
+                query += ` ${operator} [PRODUCT_TAGS].tag = @${i}`;
+            }
+            
+            let res = await req.query(query);
+            return res.recordset;
+        }
+        catch (err) {
+            console.log(err);
+            return [];
+        }
     }
 }
 
@@ -584,6 +629,197 @@ class CategoryDatabase {
         catch (err) {
             console.log(err);
             return [];
+        }
+    }
+}
+
+class CartDatabase {
+    constructor(conn) {
+        this.conn = conn;
+    }
+
+    async read(cart = {}) {
+        try {
+            let req = new mssql.Request(this.conn);
+            if (cart.user_id !== undefined) {
+                req.input("user_id", cart.user_id);
+            }
+            if (cart.product_id !== undefined) {
+                req.input("product_id", cart.product_id);
+            }
+            if (cart.amount !== undefined) {
+                req.input("amount", cart.amount);
+            }
+
+            let res = await req.query(`select * from [CART]
+                                       where 1 = 1` +
+                                       (cart.user_id    !== undefined ? " AND user_id = @user_id"       : "") +
+                                       (cart.product_id !== undefined ? " AND product_id = @product_id" : "") +
+                                       (cart.amount     !== undefined ? " AND amount = @amount"         : "")
+                                       );
+            return res.recordset;
+        }
+        catch (err) {
+            console.log(err);
+            return [];
+        }
+    }
+
+    async add(cartElement) {
+        if(!cartElement || cartElement.user_id === undefined || cartElement.product_id === undefined || cartElement.amount === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("user_id", cartElement.user_id);
+            req.input("product_id", cartElement.product_id);
+            req.input("amount", cartElement.amount);
+
+            let res = await req.query(`insert into [CART]
+                                       (user_id, product_id, amount)
+                                       values
+                                       (@user_id, @product_id, @amount)`);
+            return true;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async update(cartElement) {
+        if(!cartElement || cartElement.user_id === undefined || cartElement.product_id === undefined || cartElement.amount === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("user_id", cartElement.user_id);
+            req.input("product_id", cartElement.product_id);
+            req.input("amount", cartElement.amount);
+
+            let res = await req.query(`update [CART]
+                                       set
+                                       amount = @amount
+                                       where user_id = @user_id AND product_id = @product_id`);
+            return res.rowsAffected[0] != 0;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async delete(user_id) {
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("user_id", user_id);
+            let res = await req.query(`delete from [CART] where user_id = @user_id;`);
+            return true;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async remove(cartElement) {
+        if(!cartElement || cartElement.user_id === undefined || cartElement.product_id === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("user_id", cartElement.user_id);
+            req.input("product_id", cartElement.product_id);
+
+            let res = await req.query(`delete from [CART]
+                                       where user_id = @user_id AND product_id = @product_id`);
+            return res.rowsAffected[0] != 0;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+}
+
+class FavouriteDatabase {
+    constructor(conn) {
+        this.conn = conn;
+    }
+
+    async read(favourite = {}) {
+        try {
+            let req = new mssql.Request(this.conn);
+            if (favourite.user_id !== undefined) {
+                req.input("user_id", favourite.user_id);
+            }
+            if (favourite.product_id !== undefined) {
+                req.input("product_id", favourite.product_id);
+            }
+
+            let res = req.query(`select * from [FAVOURITE]
+                                 where 1 = 1` +
+                                 (favourite.user_id !== undefined       ? " AND user_id = @user_id"         : "") +
+                                 (favourite.product_id !== undefined    ? " AND product_id = @product_id"   : "")
+                                 );
+            return (await res).recordset;
+        }
+        catch (err) {
+            console.log(err);
+            return [];
+        }
+    }
+
+    async add(favourite) {
+        if(!favourite || favourite.user_id === undefined || favourite.product_id === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("user_id", favourite.user_id);
+            req.input("product_id", favourite.product_id);
+
+            let res = await req.query(`insert into [FAVOURITE]
+                                       (user_id, product_id)
+                                       values
+                                       (@user_id, @product_id)`);
+            return true;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async delete(user_id) {
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("user_id", user_id);
+            let res = await req.query(`delete from [FAVOURITE] where user_id = @user_id;`);
+            return true;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async remove(favourite) {
+        if(!favourite || favourite.user_id === undefined || favourite.product_id === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("user_id", favourite.user_id);
+            req.input("product_id", favourite.product_id);
+
+            let res = await req.query(`delete from [FAVOURITE]
+                                       where user_id = @user_id AND product_id = @product_id)`);
+            return true;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
         }
     }
 }
