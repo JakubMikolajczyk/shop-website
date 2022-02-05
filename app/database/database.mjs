@@ -1,5 +1,6 @@
-const mssql = require("mssql");
-const fs = require("fs");
+//const mssql = import("mssql");
+const fs = await import("fs");
+import mssql from "mssql";
 
 class UserDatabase {
     constructor(conn) {
@@ -824,75 +825,19 @@ class FavouriteDatabase {
     }
 }
 
-async function main() {
-    let connectionString = await fs.promises.readFile("./connection-string.txt", "utf-8"); 
-    let conn = new mssql.ConnectionPool(connectionString);
+let userRepo
+
+async function create() {
+    let connectionString = fs.promises.readFile("./connection-string.txt", "utf-8"); 
+    let conn = new mssql.ConnectionPool(await connectionString);
     try {
         await conn.connect();
-        let userRepo = new UserDatabase(conn);
+        let temp = new UserDatabase(conn);
+        userRepo = temp;
         let productRepo = new ProductDatabase(conn);
         let orderRepo = new OrderDatabase(conn);
         let categoryRepo = new CategoryDatabase(conn);
-
-        let user = {
-            id: 2,
-            login: "user",
-            password: "user",
-            seed: 2222,
-            street: "Kwiatowa",
-            number: "13B",
-            postal: "53601",
-            city: "Wrocław",
-            name: "Wiktor",
-            surname: "Bukowski",
-            mail: "w.bukowski",
-            phone: "123456789"
-        };
-
-        let product = {
-            id: 1,
-            name: "Deska",
-            price: 100,
-            amount: 1000,
-            img_path: "/path",
-            description: "Zwykła deska.",
-            category_id: 1
-        };
-
-        let order = {
-            id: 2,
-            user_id: 2,
-            date: new Date(),
-            status: 0
-        };
-
-        let category = {
-            id: 1,
-            name: "Meble",
-            root_id: 1
-        }
-        
-        let users = await userRepo.read();
-        users.forEach(user => {
-            console.log(user);
-        });
-
-        let products = await productRepo.read();
-        products.forEach(product => {
-            console.log(product);
-        });
-
-        let orders = await orderRepo.read();
-        orders.forEach(order => {
-            console.log(order);
-        });
-
-        await categoryRepo.delete(7);
-        let categories = await categoryRepo.read();
-        categories.forEach(category => {
-            console.log(category);
-        });
-
+        return { userRepo, productRepo, orderRepo, categoryRepo, conn };
         conn.close();
     }
     catch (err) {
@@ -901,4 +846,8 @@ async function main() {
     }
 }
 
-main();
+let res = create();
+export { res } ;
+
+console.log("Done");
+
