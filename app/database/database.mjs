@@ -828,8 +828,8 @@ class FavouriteDatabase {
 let userRepo
 
 async function create() {
-    let connectionString = fs.promises.readFile("./connection-string.txt", "utf-8"); 
-    let conn = new mssql.ConnectionPool(await connectionString);
+    let connectionString = await fs.promises.readFile("./connection-string.txt", "utf-8"); 
+    let conn = new mssql.ConnectionPool(connectionString);
     try {
         await conn.connect();
         let temp = new UserDatabase(conn);
@@ -846,7 +846,7 @@ async function create() {
     }
 }
 
-let res = create();
+let res = await create();
 export { res } ;
 
 console.log("Done");
