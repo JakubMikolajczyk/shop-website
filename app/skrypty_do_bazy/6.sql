@@ -1,7 +1,7 @@
 USE [weppo]
 GO
 
-/****** Object:  Table [dbo].[PRODUCT]    Script Date: 03.02.2022 14:39:38 ******/
+/****** Object:  Table [dbo].[PRODUCT]    Script Date: 06.02.2022 17:50:21 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -16,6 +16,7 @@ CREATE TABLE [dbo].[PRODUCT](
 	[img_path] [nvarchar](30) NULL,
 	[description] [ntext] NULL,
 	[category_id] [int] NULL,
+	[valid] [bit] NULL,
  CONSTRAINT [PK_PRODUCT] PRIMARY KEY CLUSTERED 
 (
 	[id] ASC

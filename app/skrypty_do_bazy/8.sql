@@ -1,7 +1,7 @@
 USE [weppo]
 GO
 
-/****** Object:  Table [dbo].[CART]    Script Date: 03.02.2022 14:40:03 ******/
+/****** Object:  Table [dbo].[CART]    Script Date: 06.02.2022 17:50:46 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -9,20 +9,20 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 CREATE TABLE [dbo].[CART](
-	[id_user] [int] NULL,
-	[id_product] [int] NULL,
+	[user_id] [int] NULL,
+	[product_id] [int] NULL,
 	[amount] [int] NULL
 ) ON [PRIMARY]
 GO
 
-ALTER TABLE [dbo].[CART]  WITH CHECK ADD  CONSTRAINT [FK_CART_PRODUCT] FOREIGN KEY([id_product])
+ALTER TABLE [dbo].[CART]  WITH CHECK ADD  CONSTRAINT [FK_CART_PRODUCT] FOREIGN KEY([product_id])
 REFERENCES [dbo].[PRODUCT] ([id])
 GO
 
 ALTER TABLE [dbo].[CART] CHECK CONSTRAINT [FK_CART_PRODUCT]
 GO
 
-ALTER TABLE [dbo].[CART]  WITH CHECK ADD  CONSTRAINT [FK_CART_USER] FOREIGN KEY([id_user])
+ALTER TABLE [dbo].[CART]  WITH CHECK ADD  CONSTRAINT [FK_CART_USER] FOREIGN KEY([user_id])
 REFERENCES [dbo].[USER] ([id])
 GO
 
