@@ -3,9 +3,6 @@ let express = require("express");
 let app = express()
 let mssql = require("mssql");
 
-
-
-
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
@@ -25,5 +22,3 @@ mssql.connect("server=localhost,1433;database=weppo;user id=admin;password=admin
         app.listen(3000);
     }
 })
-
-

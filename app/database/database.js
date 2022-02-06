@@ -1,5 +1,4 @@
 
-//const fs = require("fs");
 let mssql = require("mssql");
 
 class UserDatabase {
