@@ -1,15 +1,11 @@
 
-const fs = await import("fs");
-import mssql from "mssql";
+//const fs = require("fs");
+let mssql = require("mssql");
 
 class UserDatabase {
-    constructor(conn) {
-        this.conn = conn;
-    }
-
-    async read(user = {}) {
+    static async read(user = {}) {
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             if (user.id !== undefined) {
                 req.input("id", user.id);
             }
@@ -76,12 +72,12 @@ class UserDatabase {
         }
     }
 
-    async add(user) {
+    static async add(user) {
         if (!user || user.login === undefined || user.password === undefined || user.seed === undefined || user.isAdmin === undefined) {
             return false;
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("login", user.login);
             req.input("password", user.password);
             req.input("seed", user.seed);
@@ -103,12 +99,12 @@ class UserDatabase {
         }
     }
 
-    async addDetails(user) {
+    static async addDetails(user) {
         if (!user || user.id === undefined || user.name === undefined || user.surname === undefined || user.phone === undefined || user.mail === undefined) {
             return false;
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("id", user.id);
             req.input("name", user.name);
             req.input("surname", user.surname);
@@ -127,12 +123,12 @@ class UserDatabase {
         }
     }
 
-    async addAddress(user) {
+    static async addAddress(user) {
         if (!user || user.id === undefined || user.street === undefined || user.number === undefined || user.postal === undefined || user.city === undefined) {
             return false;
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("id", user.id);
             req.input("street", user.street);
             req.input("number", user.number);
@@ -151,12 +147,12 @@ class UserDatabase {
         }
     }
 
-    async updateDetails(user) {
+    static async updateDetails(user) {
         if (!user || user.id === undefined || user.name === undefined || user.surname === undefined || user.phone === undefined || user.mail === undefined) {
             return false;
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("id", user.id);
             req.input("name", user.name);
             req.input("surname", user.surname);
@@ -178,12 +174,12 @@ class UserDatabase {
         }
     }
 
-    async updateAddress(user) {
+    static async updateAddress(user) {
         if (!user || user.id === undefined || user.street === undefined || user.number === undefined || user.postal === undefined || user.city === undefined) {
             return false;
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("id", user.id);
             req.input("street", user.street);
             req.input("number", user.number);
@@ -205,9 +201,9 @@ class UserDatabase {
         }
     }
 
-    async delete(id) {
+    static async delete(id) {
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("id", id);
             let res = await req.query(`update [USER]
                                        set 
@@ -224,13 +220,9 @@ class UserDatabase {
 }
 
 class ProductDatabase {
-    constructor(conn) {
-        this.conn = conn;
-    }
-
-    async read(product = {}) {
+    static async read(product = {}) {
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             if (product.id !== undefined) {
                 req.input("id", product.id);
             }
@@ -286,7 +278,7 @@ class ProductDatabase {
         }
     }
 
-    async add(product) {
+    static async add(product) {
         if (!product || 
             product.name === undefined || 
             product.price === undefined || 
@@ -297,7 +289,7 @@ class ProductDatabase {
                 return false;
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("name", product.name);
             req.input("price", product.price);
             req.input("amount", product.amount);
@@ -317,7 +309,7 @@ class ProductDatabase {
         }
     }
 
-    async update(product) {
+    static async update(product) {
         if (!product || 
             product.id === undefined ||
             product.name === undefined || 
@@ -329,7 +321,7 @@ class ProductDatabase {
                 return false;
         }
         try {
-            let req = mssql.Request(this.conn);
+            let req = mssql.Request();
             req.input("id", product.id);
             req.input("name", product.name);
             req.input("price", product.price);
@@ -355,9 +347,9 @@ class ProductDatabase {
         }
     }
 
-    async delete(id) {
+    static async delete(id) {
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("id", id);
             let res = await req.query(`update [PRODUCT]
                                        set 
@@ -371,12 +363,12 @@ class ProductDatabase {
         }
     }
 
-    async addTag(product, tag) {
+    static async addTag(product, tag) {
         if (product.id === undefined) {
             return false;
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("id", product.id);
             req.input("tag", tag);
 
@@ -392,12 +384,12 @@ class ProductDatabase {
         }
     }
 
-    async removeTag(product, tag) {
+    static async removeTag(product, tag) {
         if (product.id === undefined) {
             return false;
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("id", product.id);
             req.input("tag", tag);
             let res = await req.query(`delete from [PRODUCT_TAGS]
@@ -410,9 +402,9 @@ class ProductDatabase {
         }
     }
 
-    async getByTags(tags, applyAND = false) {
+    static async getByTags(tags, applyAND = false) {
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             let query = `select * from [PRODUCT]
                          join [PRODUCT_TAGS] on [PRODUCT].id = [PRODUCT_TAGS].product_id
                          where ${applyAND ? 1 : 0} = 1`;
@@ -434,13 +426,9 @@ class ProductDatabase {
 }
 
 class OrderDatabase {
-    constructor(conn) {
-        this.conn = conn;
-    }
-
-    async read(order = {}) {
+    static async read(order = {}) {
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             if (order.id !== undefined) {
                 req.input("id", order.id);
             }
@@ -470,7 +458,7 @@ class OrderDatabase {
         }
     }
 
-    async add(order) {
+    static async add(order) {
         function dateToSQL(date) {
             return date.toISOString().slice(0, 19).replace('T', ' ');
         }
@@ -479,7 +467,7 @@ class OrderDatabase {
             return false;
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("user_id", order.user_id);
             req.input("date", dateToSQL(order.date));
             req.input("status", order.status);
@@ -496,12 +484,12 @@ class OrderDatabase {
         }
     }
 
-    async update(order) {
+    static async update(order) {
         if (!order || order.id === undefined || order.user_id === undefined || order.date === undefined || order.status === undefined) {
             return false;
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("id", order.id);
             req.input("user_id", order.user_id);
             req.input("date", dateToSQL(order.date));
@@ -521,9 +509,9 @@ class OrderDatabase {
         }
     }
 
-    async delete(id) {
+    static async delete(id) {
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("id", id);
 
             let res = await req.query(`delete from [ORDER_CONTENT] where order_id=@id;
@@ -536,12 +524,12 @@ class OrderDatabase {
         }
     }
 
-    async addContent(order, product_id, amount) {
+    static async addContent(order, product_id, amount) {
         if (!order || order.id === undefined) {
             return false;
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("order_id", order.id);
             req.input("product_id", product_id);
             req.input("amount", amount);
@@ -557,12 +545,12 @@ class OrderDatabase {
         }
     }
 
-    async editContentAmount(order, product_id, amount) {
+    static async editContentAmount(order, product_id, amount) {
         if(!order || order.id === undefined) {
             return false;
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("order_id", order.id);
             req.input("product_id", product_id);
             req.input("amount", amount);
@@ -580,12 +568,12 @@ class OrderDatabase {
         }
     }
 
-    async removeContent(order, product_id) {
+    static async removeContent(order, product_id) {
         if(!order || order.id === undefined) {
             return false;
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("order_id", order.id);
             req.input("product_id", product_id);
             req.input("amount", amount);
@@ -601,12 +589,12 @@ class OrderDatabase {
         }
     }
 
-    async getContent(order) {
+    static async getContent(order) {
         if (!order || order.id === undefined) {
             return [];
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("id", order.id);
 
             let res = await req.query(`select * from [ORDER_CONTENT]
@@ -621,13 +609,9 @@ class OrderDatabase {
 }
 
 class CategoryDatabase {
-    constructor(conn) {
-        this.conn = conn;
-    }
-
-    async read(category = {}) {
+    static async read(category = {}) {
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             if (category.id !== undefined) {
                 req.input("id", category.id);
             }
@@ -652,12 +636,12 @@ class CategoryDatabase {
         }
     }
 
-    async add(category) {
+    static async add(category) {
         if (!category || category.name === undefined) {
             return false;
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("name", category.name);
             if (category.root_id !== undefined) {
                 req.input("root_id", category.root_id);
@@ -678,12 +662,12 @@ class CategoryDatabase {
         }
     }
 
-    async update(category) {
+    static async update(category) {
         if(!category || category.id === undefined || category.name === undefined) {
             return false;
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("id", category.id);
             req.input("name", category.name);
             if (category.root_id !== undefined) {
@@ -706,9 +690,9 @@ class CategoryDatabase {
         }
     }
 
-    async delete(id) {
+    static async delete(id) {
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("id", id);
             
             let res = await req.query(`delete from [CATEGORY] where id = @id`);
@@ -720,12 +704,12 @@ class CategoryDatabase {
         }
     }
 
-    async getChildren(category) {
+    static async getChildren(category) {
         if(!category || category.id === undefined) {
             return [];
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("id", category.id);
             let res = await req.query(`select * from [CATEGORY]
                                        where [CATEGORY].root_id=@id`);
@@ -739,13 +723,9 @@ class CategoryDatabase {
 }
 
 class CartDatabase {
-    constructor(conn) {
-        this.conn = conn;
-    }
-
-    async read(cart = {}) {
+    static async read(cart = {}) {
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             if (cart.user_id !== undefined) {
                 req.input("user_id", cart.user_id);
             }
@@ -770,12 +750,12 @@ class CartDatabase {
         }
     }
 
-    async add(cartElement) {
+    static async add(cartElement) {
         if(!cartElement || cartElement.user_id === undefined || cartElement.product_id === undefined || cartElement.amount === undefined) {
             return false;
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("user_id", cartElement.user_id);
             req.input("product_id", cartElement.product_id);
             req.input("amount", cartElement.amount);
@@ -792,12 +772,12 @@ class CartDatabase {
         }
     }
 
-    async update(cartElement) {
+    static async update(cartElement) {
         if(!cartElement || cartElement.user_id === undefined || cartElement.product_id === undefined || cartElement.amount === undefined) {
             return false;
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("user_id", cartElement.user_id);
             req.input("product_id", cartElement.product_id);
             req.input("amount", cartElement.amount);
@@ -814,9 +794,9 @@ class CartDatabase {
         }
     }
 
-    async delete(user_id) {
+    static async delete(user_id) {
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("user_id", user_id);
             let res = await req.query(`delete from [CART] where user_id = @user_id;`);
             return true;
@@ -827,12 +807,12 @@ class CartDatabase {
         }
     }
 
-    async remove(cartElement) {
+    static async remove(cartElement) {
         if(!cartElement || cartElement.user_id === undefined || cartElement.product_id === undefined) {
             return false;
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("user_id", cartElement.user_id);
             req.input("product_id", cartElement.product_id);
 
@@ -848,13 +828,9 @@ class CartDatabase {
 }
 
 class FavouriteDatabase {
-    constructor(conn) {
-        this.conn = conn;
-    }
-
-    async read(favourite = {}) {
+    static async read(favourite = {}) {
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             if (favourite.user_id !== undefined) {
                 req.input("user_id", favourite.user_id);
             }
@@ -875,12 +851,12 @@ class FavouriteDatabase {
         }
     }
 
-    async add(favourite) {
+    static async add(favourite) {
         if(!favourite || favourite.user_id === undefined || favourite.product_id === undefined) {
             return false;
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("user_id", favourite.user_id);
             req.input("product_id", favourite.product_id);
 
@@ -896,9 +872,9 @@ class FavouriteDatabase {
         }
     }
 
-    async delete(user_id) {
+    static async delete(user_id) {
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("user_id", user_id);
             let res = await req.query(`delete from [FAVOURITE] where user_id = @user_id;`);
             return true;
@@ -909,12 +885,12 @@ class FavouriteDatabase {
         }
     }
 
-    async remove(favourite) {
+    static async remove(favourite) {
         if(!favourite || favourite.user_id === undefined || favourite.product_id === undefined) {
             return false;
         }
         try {
-            let req = new mssql.Request(this.conn);
+            let req = new mssql.Request();
             req.input("user_id", favourite.user_id);
             req.input("product_id", favourite.product_id);
 
@@ -929,26 +905,4 @@ class FavouriteDatabase {
     }
 }
 
-
-let userRepo, productRepo, orderRepo, categoryRepo, cartRepo, favouriteRepo, conn;
-
-async function create() {
-    let connectionString = await fs.promises.readFile("./connection-string.txt", "utf-8"); 
-    conn = new mssql.ConnectionPool(connectionString);
-    try {
-        await conn.connect();
-        userRepo = new UserDatabase(conn);
-        productRepo = new ProductDatabase(conn);
-        orderRepo = new OrderDatabase(conn);
-        categoryRepo = new CategoryDatabase(conn);
-        cartRepo = new CartDatabase(conn);
-        favouriteRepo = new FavouriteDatabase(conn);
-    }
-    catch (err) {
-        conn.close();
-        console.log(err);
-    }
-}
-
-await create();
-export { userRepo, productRepo, orderRepo, categoryRepo, cartRepo, favouriteRepo, conn } ;
+module.exports =  {UserDatabase, ProductDatabase, OrderDatabase, CategoryDatabase, CartDatabase, FavouriteDatabase};
