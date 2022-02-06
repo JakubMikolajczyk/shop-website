@@ -3,7 +3,7 @@ let express = require("express");
 let app = express()
 let mssql = require("mssql");
 
-app.use( bodyParser.json() );       // to support JSON-encoded bodies
+app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
 }));
