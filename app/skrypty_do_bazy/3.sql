@@ -1,7 +1,7 @@
 USE [weppo]
 GO
 
-/****** Object:  Table [dbo].[USER]    Script Date: 06.02.2022 17:49:28 ******/
+/****** Object:  Table [dbo].[USER]    Script Date: 06.02.2022 21:57:15 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -11,10 +11,9 @@ GO
 CREATE TABLE [dbo].[USER](
 	[id] [int] IDENTITY(1,1) NOT NULL,
 	[login] [nvarchar](20) NOT NULL,
-	[password] [nvarchar](20) NOT NULL,
-	[seed] [bigint] NOT NULL,
-	[isAdmin] [bit] NULL,
-	[valid] [bit] NULL,
+	[password] [nvarchar](50) NOT NULL,
+	[isAdmin] [bit] NOT NULL,
+	[valid] [bit] NOT NULL,
  CONSTRAINT [PK_USER] PRIMARY KEY CLUSTERED 
 (
 	[id] ASC
