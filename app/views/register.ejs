@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+    </style>
+</head>
+
+<body>
+
+<%- include('navbar') %>
+<div>
+    <form method="POST">
+
+        <label for="user">Login: </label>
+        <input type="text" name="login" value=<%=prevValue.login%> > <span style="color: red"> <%=message.login%></span><br>
+
+        <label for="user">Hasło: </label>
+        <input type="password" name="password"> <span style="color: red"> <%=message.password%></span> <br>
+
+        <label for="user">Powtórz hasło: </label>
+        <input type="password" name="againpassword"> <span style="color: red"> <%=message.password%></span> <br>
+
+        <label for="name">Imie: </label>
+        <input type="text" name="name" value=<%=prevValue.name%>> <span style="color: red"> <%=message.name%></span> <br>
+
+        <label for="surname">Nazwisko: </label>
+        <input type="text" name="surname" value=<%=prevValue.surname%>> <span style="color: red"> <%=message.surname%></span> <br>
+
+        <label for="phone ">Numer telefonu: </label>
+        <input type="text" name="phone" value=<%=prevValue.phone%>> <span style="color: red"> <%=message.phone%></span> <br>
+
+        <label for="email">Adres email: </label>
+        <input type="email" name="email" value=<%=prevValue.email%>> <span style="color: red"> <%=message.email%></span> <br>
+
+        <label for="street">Ulica: </label>
+        <input type="text" name="street" value=<%=prevValue.street%>> <span style="color: red"> <%=message.street%></span> <br>
+
+        <label for="number">Numer mieszkania: </label>
+        <input type="text" name="number" value=<%=prevValue.number%>> <span style="color: red"> <%=message.number%></span> <br>
+
+        <label for="postal">Kod pocztowy: </label>
+        <input type="text" name="postal" value=<%=prevValue.postal%>> <span style="color: red"> <%=message.postal%></span> <br>
+
+        <label for="city ">Miasto: </label>
+        <input type="text" name="city" value=<%=prevValue.city%>> <span style="color: red"> <%=message.city%></span> <br>
+
+        <button type="submit">Zarejestruj się</button>
+
+    </form>
+</div>
+
+
+</body>
+</html>
