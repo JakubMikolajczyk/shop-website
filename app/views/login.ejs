@@ -5,19 +5,16 @@
 <%- include('navbar') %>
 
 
+<div>
+    <form method="post">
+        <label for="user">Login: </label>
+        <input type="text" name="login"><br>
 
-<div class="container">
-    <div class="row">
-        <h1>Home</h1>
-    </div>
-    <hr>
-    <div class="row">
-        <form method="post">
-            <label for="user">Imie</label>
-            <input type="text" id="user" name="user">
-            <input type="submit">
-        </form>
-    </div>
+        <label for="user">Hasło: </label>
+        <input type="password" name="password"><br>
+
+        <button type="submit">Zaloguj się</button>
+    </form>
 </div>
 </body>
 </html>
