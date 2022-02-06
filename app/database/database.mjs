@@ -66,7 +66,7 @@ class UserDatabase {
             let result =  res.recordset;
             result.map(user => {
                 user.id = user.id[0];
-                user.seed = BigInt(user.seed);
+                //user.seed = (user.seed);
             })
             return result;
         }
@@ -314,6 +314,15 @@ class ProductDatabase {
         catch (err) {
             console.log(err);
             return false;
+        }
+    }
+
+    async addTags(product_id, tags) {
+        try {
+
+        }
+        catch (err) {
+            console.log(err);
         }
     }
 
@@ -825,20 +834,20 @@ class FavouriteDatabase {
     }
 }
 
-let userRepo
+
+let userRepo, productRepo, orderRepo, categoryRepo, cartRepo, favouriteRepo, conn;
 
 async function create() {
     let connectionString = await fs.promises.readFile("./connection-string.txt", "utf-8"); 
-    let conn = new mssql.ConnectionPool(connectionString);
+    conn = new mssql.ConnectionPool(connectionString);
     try {
         await conn.connect();
-        let temp = new UserDatabase(conn);
-        userRepo = temp;
-        let productRepo = new ProductDatabase(conn);
-        let orderRepo = new OrderDatabase(conn);
-        let categoryRepo = new CategoryDatabase(conn);
-        return { userRepo, productRepo, orderRepo, categoryRepo, conn };
-        conn.close();
+        userRepo = new UserDatabase(conn);
+        productRepo = new ProductDatabase(conn);
+        orderRepo = new OrderDatabase(conn);
+        categoryRepo = new CategoryDatabase(conn);
+        cartRepo = new CartDatabase(conn);
+        favouriteRepo = new FavouriteDatabase(conn);
     }
     catch (err) {
         conn.close();
@@ -846,8 +855,5 @@ async function create() {
     }
 }
 
-let res = await create();
-export { res } ;
-
-console.log("Done");
-
+await create();
+export { userRepo, productRepo, orderRepo, categoryRepo, cartRepo, favouriteRepo, conn } ;
