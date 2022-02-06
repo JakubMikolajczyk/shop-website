@@ -1,5 +1,6 @@
-const mssql = require("mssql");
-const fs = require("fs");
+
+const fs = await import("fs");
+import mssql from "mssql";
 
 class UserDatabase {
     constructor(conn) {
@@ -65,7 +66,7 @@ class UserDatabase {
             let result =  res.recordset;
             result.map(user => {
                 user.id = user.id[0];
-                user.seed = BigInt(user.seed);
+                //user.seed = (user.seed);
             })
             return result;
         }
@@ -370,6 +371,45 @@ class ProductDatabase {
         }
     }
 
+    async addTag(product, tag) {
+        if (product.id === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("id", product.id);
+            req.input("tag", tag);
+
+            let res = await req.query(`insert into [PRODUCT_TAGS]
+                                       (product_id, tags)
+                                       values
+                                       (@id, @tag);`);
+            return res.rowsAffected[0] != 0;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async removeTag(product, tag) {
+        if (product.id === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("id", product.id);
+            req.input("tag", tag);
+            let res = await req.query(`delete from [PRODUCT_TAGS]
+                                       where product_id = @id AND tag = @tag`);
+            return res.rowsAffected[0] != 0;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
     async getByTags(tags, applyAND = false) {
         try {
             let req = new mssql.Request(this.conn);
@@ -488,6 +528,71 @@ class OrderDatabase {
 
             let res = await req.query(`delete from [ORDER_CONTENT] where order_id=@id;
                                        delete from [ORDER] where id=@id`);
+            return true;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async addContent(order, product_id, amount) {
+        if (!order || order.id === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("order_id", order.id);
+            req.input("product_id", product_id);
+            req.input("amount", amount);
+            let res = await req.query(`insert into [ORDER_CONTENT]
+                                       (order_id, product_id, amount)
+                                       values
+                                       (@order_id, @product_id, @amount)`);
+            return res.rowsAffected[0] != 0;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async editContentAmount(order, product_id, amount) {
+        if(!order || order.id === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("order_id", order.id);
+            req.input("product_id", product_id);
+            req.input("amount", amount);
+            let res = await req.query(`update [ORDER_CONTENT]
+                                       set
+                                       amount=@amount
+                                       where
+                                       order_id = @order_id AND
+                                       product_id = @product_id`);
+            return res.rowsAffected[0] != 0;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async removeContent(order, product_id) {
+        if(!order || order.id === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("order_id", order.id);
+            req.input("product_id", product_id);
+            req.input("amount", amount);
+            let res = await req.query(`delete from [ORDER_CONTENT]
+                                       where
+                                       order_id = @order_id AND
+                                       product_id = @product_id`);
             return true;
         }
         catch (err) {
@@ -824,76 +929,20 @@ class FavouriteDatabase {
     }
 }
 
-async function main() {
+
+let userRepo, productRepo, orderRepo, categoryRepo, cartRepo, favouriteRepo, conn;
+
+async function create() {
     let connectionString = await fs.promises.readFile("./connection-string.txt", "utf-8"); 
-    let conn = new mssql.ConnectionPool(connectionString);
+    conn = new mssql.ConnectionPool(connectionString);
     try {
         await conn.connect();
-        let userRepo = new UserDatabase(conn);
-        let productRepo = new ProductDatabase(conn);
-        let orderRepo = new OrderDatabase(conn);
-        let categoryRepo = new CategoryDatabase(conn);
-
-        let user = {
-            id: 2,
-            login: "user",
-            password: "user",
-            seed: 2222,
-            street: "Kwiatowa",
-            number: "13B",
-            postal: "53601",
-            city: "Wrocław",
-            name: "Wiktor",
-            surname: "Bukowski",
-            mail: "w.bukowski",
-            phone: "123456789"
-        };
-
-        let product = {
-            id: 1,
-            name: "Deska",
-            price: 100,
-            amount: 1000,
-            img_path: "/path",
-            description: "Zwykła deska.",
-            category_id: 1
-        };
-
-        let order = {
-            id: 2,
-            user_id: 2,
-            date: new Date(),
-            status: 0
-        };
-
-        let category = {
-            id: 1,
-            name: "Meble",
-            root_id: 1
-        }
-        
-        let users = await userRepo.read();
-        users.forEach(user => {
-            console.log(user);
-        });
-
-        let products = await productRepo.read();
-        products.forEach(product => {
-            console.log(product);
-        });
-
-        let orders = await orderRepo.read();
-        orders.forEach(order => {
-            console.log(order);
-        });
-
-        await categoryRepo.delete(7);
-        let categories = await categoryRepo.read();
-        categories.forEach(category => {
-            console.log(category);
-        });
-
-        conn.close();
+        userRepo = new UserDatabase(conn);
+        productRepo = new ProductDatabase(conn);
+        orderRepo = new OrderDatabase(conn);
+        categoryRepo = new CategoryDatabase(conn);
+        cartRepo = new CartDatabase(conn);
+        favouriteRepo = new FavouriteDatabase(conn);
     }
     catch (err) {
         conn.close();
@@ -901,4 +950,5 @@ async function main() {
     }
 }
 
-main();
+await create();
+export { userRepo, productRepo, orderRepo, categoryRepo, cartRepo, favouriteRepo, conn } ;
