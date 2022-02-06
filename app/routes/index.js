@@ -1,9 +1,12 @@
-var express = require('express')
-var router = express.Router();
+let express = require('express')
+let router = express.Router();
+let db = require("../database/database");
 
 
-router.get('/', function (req,res){
-    res.send("Hello World")
+router.get('/', async function (req,res){
+    db.OrderDatabase.read()     
+    let result = await db.UserDatabase.read();
+    res.send(result);
 })
 
-module.exports = router
+module.exports =  router;

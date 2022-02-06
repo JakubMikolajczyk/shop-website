@@ -1,17 +1,24 @@
-let express = require('express')
+let bodyParser = require("body-parser");
+let express = require("express");
 let app = express()
-let bodyParser = require('body-parser')
+let mssql = require("mssql");
 
-
-app.use( bodyParser.json() );       // to support JSON-encoded bodies
+app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
 }));
 
 app.set('view engine', 'ejs')
 app.set('views', './views')
+    
+let router = require("./routes/index.js");
+app.use(router)
 
-app.use(require('./routes/index'))
-
-
-app.listen(3000)
+mssql.connect("server=localhost,1433;database=weppo;user id=admin;password=admin;trustServerCertificate=true", err => {
+    if ( err ) {
+        console.log(err);
+    }
+    else {
+        app.listen(3000);
+    }
+})
