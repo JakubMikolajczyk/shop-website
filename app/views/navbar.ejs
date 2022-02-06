@@ -105,20 +105,20 @@
 
         <div class="dropdown">
             <button class="dropbtn">
-                <% if (navbar.username !=='' ) {%>
-                    Witaj, <%=navbar.username%>
+                <% if (user.username !=='' ) {%>
+                    Witaj, <%=user.username%>
                         <% } else {%>
                             Zaloguj/Zarejestruj
                             <%}%>
             </button>
 
             <div class="dropdown-content">
-                <% if (navbar.username !=='' ) {%>
+                <% if (user.username !=='' ) {%>
                     <a href="/settings">Ustawienia</a>
                     <a href="/favourite">Obserwacje</a>
                     <a href="/checkout">Koszyk</a>
                     <a href="/orders">Historia zamówień</a>
-                    <% if (navbar.isAdmin){%>
+                    <% if (user.isAdmin){%>
                         <a href="/orders">Lista zamówień</a>
                         <a href="/users">Lista użytkowników</a>
                         <a href="/product">Dodaj produkt</a>
@@ -132,7 +132,7 @@
 
         </div>
 
-        <% if (navbar.username !=='' ) {%>
+        <% if (user.username !=='' ) {%>
             <a href="checkout" style="float: right">Koszyk</a>
             <a href="favourite" style="float: right">Favourite</a>
             <% } %>

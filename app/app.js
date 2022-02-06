@@ -11,8 +11,9 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 app.set('view engine', 'ejs')
 app.set('views', './views')
     
-let router = require("./routes/index.js");
-app.use(router)
+
+app.use(require("./routes/index.js"));
+app.use(require("./routes/product.js"));
 
 mssql.connect("server=localhost,1433;database=weppo;user id=admin;password=admin;trustServerCertificate=true", err => {
     if ( err ) {
