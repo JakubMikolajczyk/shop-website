@@ -1,4 +1,4 @@
-//const mssql = import("mssql");
+
 const fs = await import("fs");
 import mssql from "mssql";
 
@@ -317,15 +317,6 @@ class ProductDatabase {
         }
     }
 
-    async addTags(product_id, tags) {
-        try {
-
-        }
-        catch (err) {
-            console.log(err);
-        }
-    }
-
     async update(product) {
         if (!product || 
             product.id === undefined ||
@@ -373,6 +364,45 @@ class ProductDatabase {
                                        valid=0
                                        where id=@id`);
             return true;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async addTag(product, tag) {
+        if (product.id === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("id", product.id);
+            req.input("tag", tag);
+
+            let res = await req.query(`insert into [PRODUCT_TAGS]
+                                       (product_id, tags)
+                                       values
+                                       (@id, @tag);`);
+            return res.rowsAffected[0] != 0;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async removeTag(product, tag) {
+        if (product.id === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("id", product.id);
+            req.input("tag", tag);
+            let res = await req.query(`delete from [PRODUCT_TAGS]
+                                       where product_id = @id AND tag = @tag`);
+            return res.rowsAffected[0] != 0;
         }
         catch (err) {
             console.log(err);
@@ -498,6 +528,71 @@ class OrderDatabase {
 
             let res = await req.query(`delete from [ORDER_CONTENT] where order_id=@id;
                                        delete from [ORDER] where id=@id`);
+            return true;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async addContent(order, product_id, amount) {
+        if (!order || order.id === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("order_id", order.id);
+            req.input("product_id", product_id);
+            req.input("amount", amount);
+            let res = await req.query(`insert into [ORDER_CONTENT]
+                                       (order_id, product_id, amount)
+                                       values
+                                       (@order_id, @product_id, @amount)`);
+            return res.rowsAffected[0] != 0;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async editContentAmount(order, product_id, amount) {
+        if(!order || order.id === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("order_id", order.id);
+            req.input("product_id", product_id);
+            req.input("amount", amount);
+            let res = await req.query(`update [ORDER_CONTENT]
+                                       set
+                                       amount=@amount
+                                       where
+                                       order_id = @order_id AND
+                                       product_id = @product_id`);
+            return res.rowsAffected[0] != 0;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
+    async removeContent(order, product_id) {
+        if(!order || order.id === undefined) {
+            return false;
+        }
+        try {
+            let req = new mssql.Request(this.conn);
+            req.input("order_id", order.id);
+            req.input("product_id", product_id);
+            req.input("amount", amount);
+            let res = await req.query(`delete from [ORDER_CONTENT]
+                                       where
+                                       order_id = @order_id AND
+                                       product_id = @product_id`);
             return true;
         }
         catch (err) {
