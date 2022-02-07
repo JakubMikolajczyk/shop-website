@@ -72,19 +72,18 @@ class UserDatabase {
     }
 
     static async add(user) {
-        if (!user || user.login === undefined || user.password === undefined || user.seed === undefined || user.isAdmin === undefined) {
+        if (!user || user.login === undefined || user.password === undefined || user.isAdmin === undefined) {
             return false;
-        }
+        }   
         try {
             let req = new mssql.Request();
             req.input("login", user.login);
             req.input("password", user.password);
-            req.input("seed", user.seed);
             req.input("isAdmin", user.isAdmin ? 1 : 0);
             let res = await req.query(`insert into [USER]
-                                       (login, password, seed, isAdmin, valid)
+                                       (login, password, isAdmin, valid)
                                        values
-                                       (@login, @password, @seed, @isAdmin, 1)
+                                       (@login, @password, @isAdmin, 1)
                                        select scope_identity() as id;
                                        `);
 
