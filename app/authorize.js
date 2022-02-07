@@ -41,7 +41,7 @@ async function isAdmin(req, res, next){
 async function isUser(req, res, next){
     await any(req,res, next, true)
 
-    if (req.user.id !== 0){
+    if (req.user.id !== 0 && (req.user.id == req.params.user_id || req.user.isAdmin || req.params.user_id == undefined)){
         next()
     }
     else {
