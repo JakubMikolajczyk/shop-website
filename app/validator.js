@@ -70,6 +70,7 @@ function validUser(user){
 
 
 function validProduct(product){
+
     let message = {};
     message.error = false;
     if (product.name > 20) {
@@ -94,5 +95,4 @@ function validProduct(product){
     }
     return message;
 }
-
 module.exports = {validUser, validProduct}

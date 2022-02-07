@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 
     <style>
-        .topnavbar {
+        .topnavbar{
             overflow: hidden;
             background-color: gray;
             max-height: 50px;
         }
 
-        .topnavbar a {
+        .topnavbar a{
             float: left;
             display: block;
             color: black;
@@ -25,11 +24,11 @@
             color: black;
         }
 
-        .topnavbar .search {
+        .topnavbar .search{
             float: right;
         }
 
-        .topnavbar input {
+        .topnavbar input{
             padding: 6px;
             margin-top: 8px;
             font-size: 17px;
@@ -46,6 +45,7 @@
             border: none;
             cursor: pointer;
         }
+
 
         .topnavbar .search button:hover {
             background: darkgrey;
@@ -73,7 +73,7 @@
             position: absolute;
             background-color: #f9f9f9;
             min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
             z-index: 1;
         }
 
@@ -93,58 +93,58 @@
         .dropdown:hover .dropdown-content {
             display: block;
         }
+
     </style>
 </head>
-
 <body>
-    <div class="topnavbar">
+<div class="topnavbar">
 
-        <a href="/">
-            Home
-        </a>
+    <a href="/">
+       Home
+    </a>
 
-        <div class="dropdown">
-            <button class="dropbtn">
-                <% if (user.username !=='' ) {%>
-                    Witaj, <%=user.username%>
-                        <% } else {%>
-                            Zaloguj/Zarejestruj
-                            <%}%>
-            </button>
+    <div class="dropdown">
+        <button class="dropbtn">
+            <% if (user.login !== '') {%>
+                Witaj, <%=user.login%>
+            <% } else {%>
+                Zaloguj/Zarejestruj
+            <%}%>
+        </button>
 
-            <div class="dropdown-content">
-                <% if (user.username !=='' ) {%>
-                    <a href="/settings">Ustawienia</a>
-                    <a href="/favourite">Obserwacje</a>
-                    <a href="/checkout">Koszyk</a>
-                    <a href="/orders">Historia zamówień</a>
-                    <% if (user.isAdmin){%>
-                        <a href="/orders">Lista zamówień</a>
-                        <a href="/users">Lista użytkowników</a>
-                        <a href="/product">Dodaj produkt</a>
-                        <%}%>
-                            <a href="/logout">Wyloguj się</a>
-                            <% } else {%>
-                                <a href="/login">Zaloguj się</a>
-                                <a href="/register">Zarejestru się</a>
-                                <%}%>
-            </div>
+        <div class="dropdown-content">
+            <% if (user.login !== '') {%>
+                <a href="/settings">Ustawienia</a>
+                <a href="/favourite">Obserwacje</a>
+                <a href="/checkout">Koszyk</a>
+                <a href="/orders">Historia zamówień</a>
+                <% if (user.isAdmin){%>
+                    <a href="/orders">Lista zamówień</a>
+                    <a href="/users">Lista użytkowników</a>
+                    <a href="/product">Dodaj produkt</a>
+                <%}%>
 
+                <a href="/users/logout">Wyloguj się</a>
+            <% } else {%>
+                <a href="/users/login">Zaloguj się</a>
+                <a href="/users/register">Zarejestruj się</a>
+            <%}%>
         </div>
 
-        <% if (user.username !=='' ) {%>
-            <a href="checkout" style="float: right">Koszyk</a>
-            <a href="favourite" style="float: right">Favourite</a>
-            <% } %>
+    </div>
 
-                <div class="search">
-                    <form action="/" method="post">
-                        <input type="text" id="user" name="user">
-                        <button type="submit">Wyszukaj</button>
-                    </form>
+    <% if (user.login !== '') {%>
+        <a href="checkout" style="float: right">Koszyk</a>
+        <a href="favourite" style="float: right">Favourite</a>
+    <% } %>
 
-                </div>
+    <div class="search">
+        <form action="/" method="post">
+            <input type="text" id="user" name="user">
+            <button type="submit">Wyszukaj</button>
+        </form>
 
+    </div>
 
 
 
