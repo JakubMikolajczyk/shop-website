@@ -3,7 +3,7 @@ let userSetting = {
     name: 20,
     surname: 30,
     phone: 9,
-    email: 30,
+    mail: 30,
     street: 40,
     number: 10,
     postal: 5,
