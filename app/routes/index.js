@@ -1,12 +1,10 @@
-let express = require('express')
+let express = require('express');
 let router = express.Router();
 let db = require("../database/database");
 
 
-router.get('/', async function (req,res){
-    db.OrderDatabase.read()     
-    let result = await db.UserDatabase.read();
-    res.send(result);
+router.get('/', async function (req,res) {
+    res.send("hello world!");
 })
 
 module.exports =  router;

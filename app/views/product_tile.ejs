@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        img {
+            width: inherit;
+            height: inherit;
+        }
+
+        div.product_list {
+            width: 50%;
+            margin: auto;
+        }
+
+        div.product_tile {
+            margin: 50px;
+            position: relative;
+        }
+
+        div.image {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border: 1px solid lightgrey;
+            right: 0%;
+        }
+
+        div.name {
+            position: relative;
+            margin: 10px;
+            padding: 10px;
+            display: inline;
+            right: 0%;
+        }
+
+        div.details {
+            position: relative;
+            margin: 10px;
+            padding: 10px;
+            background-color: lightgreen;
+            text-align: center;
+            color: white;
+            border: dashed white;
+            display: inline;
+            right: 0px;
+            bottom: 0%;
+        }
+
+        div.price {
+            position: relative;
+            margin: 10px;
+            padding: 10px;
+            display: block;
+            right: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include("navbar") %>
+        <div class="product_list">
+
+            <% for(let i=0; i < array.length; i++) { %>
+                <div class="product_tile">
+
+                    <div class="image">
+                        <img src="http://localhost:3000/image/<%- array[i].id %>.png" alt="Unable to load the image.">
+                    </div>
+                    <div class="info">
+                        <div class="name">
+                            <%= array[i].name %>
+                        </div>
+                        <div class="price">
+                            Cena: <%= array[i].price %>
+                        </div>
+                        <div class="details">
+                            <a href="/products/<%- array[i].id %>"> Pokaż szczegóły </a>
+                        </div>
+                    </div>
+
+                </div>
+                <% } %>
+        </div>
+</body>
+
+</html>

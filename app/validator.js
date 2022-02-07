@@ -71,10 +71,28 @@ function validUser(user){
 
 function validProduct(product){
 
+    let message = {};
+    message.error = false;
+    if (product.name > 20) {
+        message.error = true;
+        message.name = "Name can't be longer than 20 characters!";
+    }
+    if (product.name == "") {
+        message.error = true;
+        message.name = "Name mustn't be empty!";
+    }
+    if (product.price < 0) {
+        message.error = true;
+        message.price = "Price can't be negative!";
+    }
+    if (product.amount < 0) {
+        message.error = true;
+        message.amount = "Amount can't be negative!";
+    }
+    if (product.description == "") {
+        message.error = true;
+        message.description = "Description mustn't be empty!";
+    }
+    return message;
 }
-
-
-
-
-
 module.exports = {validUser, validProduct}

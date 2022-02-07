@@ -72,19 +72,18 @@ class UserDatabase {
     }
 
     static async add(user) {
-        if (!user || user.login === undefined || user.password === undefined || user.seed === undefined || user.isAdmin === undefined) {
+        if (!user || user.login === undefined || user.password === undefined || user.isAdmin === undefined) {
             return false;
-        }
+        }   
         try {
             let req = new mssql.Request();
             req.input("login", user.login);
             req.input("password", user.password);
-            req.input("seed", user.seed);
             req.input("isAdmin", user.isAdmin ? 1 : 0);
             let res = await req.query(`insert into [USER]
-                                       (login, password, seed, isAdmin, valid)
+                                       (login, password, isAdmin, valid)
                                        values
-                                       (@login, @password, @seed, @isAdmin, 1)
+                                       (@login, @password, @isAdmin, 1)
                                        select scope_identity() as id;
                                        `);
 
@@ -94,6 +93,7 @@ class UserDatabase {
         }
         catch (err) {
             console.log(err);
+            throw Error("User already exists.")
             return false;
         }
     }
@@ -115,6 +115,7 @@ class UserDatabase {
                                        values
                                        (@id, @name, @surname, @phone, @mail)`
             );
+            return res.rowsAffected[0] != 0;
         }
         catch (err) {
             console.log(err);
@@ -138,7 +139,7 @@ class UserDatabase {
                                        (id, street, number, postal, city)
                                        values
                                        (@id, @street, @number, @postal, @city)`);
-            return true;
+            return res.rowsAffected[0] != 0;
         }
         catch (err) {
             console.log(err);
@@ -282,7 +283,6 @@ class ProductDatabase {
             product.name === undefined || 
             product.price === undefined || 
             product.amount === undefined || 
-            product.img_path === undefined || 
             product.description === undefined || 
             product.category_id === undefined) {
                 return false;
@@ -292,14 +292,16 @@ class ProductDatabase {
             req.input("name", product.name);
             req.input("price", product.price);
             req.input("amount", product.amount);
-            req.input("img_path", product.img_path);
             req.input("description", product.description);
             req.input("category_id", product.category_id);
 
             let res = await req.query(`insert into [PRODUCT]
-                                 (name, price, amount, img_path, description, category_id, valid)
+                                 (name, price, amount, description, category_id, valid)
                                  values
-                                 (@name, @price, @amount, @img_path, @description, @category_id, 1)`);
+                                 (@name, @price, @amount, @description, @category_id, 1)
+                                 select scope_identity() as id;
+                                 `);
+            product.id = res.recordset[0].id;
             return res.rowsAffected[0] != 0;
         }
         catch (err) {

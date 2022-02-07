@@ -1,20 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>
+        <%= product.name %>
+    </title>
     <style>
+        div.product_card {
+            margin: auto;
+            width: 70%;
+            position: relative;
+        }
         div.image {
-
+            position: relative;
+            left: 0%;
+            display: inline-block;
+        } 
+        div.basic {
+            position: relative;
+            right: 0%;
+            display: inline;
+        }
+        div.description {
+            position: relative;
         }
     </style>
 </head>
-<body>
-    <div class="image">
-        <img src=<% "./database/photos/" + product.id %>>
 
-    </div>
+<body>
+    <%- include("navbar") %>
+
+        <div class="product_card">
+            <div class="image">
+                <img src="http://localhost:3000/image/<%- product.id %>.png" alt="Unable to load the image.">
+            </div>
+
+            <div class="basic">
+                <span>
+                    <%= product.name %>
+                </span>
+                <ul>
+                    <li>
+                        <%- product.price %>
+                    </li>
+                    <% if (user.id) {%>
+                        <li>
+                            <form method="post" action="/checkout/<%- user.id %>/<%- product.id %>">
+                                <button type="submit">Dodaj do koszyka</button>
+                            </form>
+                        </li>
+                        <li>
+                            <form method="post" action="/favourites/<%- user.id %>/<%- product.id %>">
+                                <button type="submit"> Obserwuj </button>
+                            </form>
+                        </li>
+                        <% } %>
+                            <% if (user.isAdmin) { %>
+                                <li>
+                                    <form method="post" action="/products/<%- product.id %>">
+                                        <button type="submit"> Edytuj </button>
+                                    </form>
+                                </li>
+                                <li>
+                                    <form method="post" action="/products/<%- product.id %>">
+                                        <input hidden="true" value="DELETE" name="method">
+                                        <button type="submit"> Usuń </button>
+                                    </form>
+                                </li>
+                                <% } %>
+
+                </ul>
+            </div>
+
+            <div class="description">
+                <p>
+                    <%= product.description %>
+                </p>
+            </div>
+
+        </div>
 </body>
+
 </html>
