@@ -92,8 +92,8 @@ class UserDatabase {
             return true;
         }
         catch (err) {
-            
             console.log(err);
+            throw Error("User already exists.")
             return false;
         }
     }
