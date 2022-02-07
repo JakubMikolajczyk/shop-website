@@ -3,12 +3,19 @@ let router = express.Router();
 let db = require("../database/database");
 
 router.get("/products", async (req, res) => {
+    let user = {
+        login: "login",
+        password: "12345",
+        isAdmin: false
+    }
+    await db.UserDatabase.add(user);
+    await db.UserDatabase.add(user);
     let products = await db.ProductDatabase.read({valid: 1});
     res.render("product_tile", {array: products, user: { id: 2,  username: "Wiktor", isAdmin: true}});
 });
 
 router.post("/products", async (req, res) => {
-    
+
 });
 
 router.get("/products/:id", async (req,res) => {

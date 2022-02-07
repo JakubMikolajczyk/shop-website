@@ -92,6 +92,7 @@ class UserDatabase {
             return true;
         }
         catch (err) {
+            
             console.log(err);
             return false;
         }
@@ -138,7 +139,7 @@ class UserDatabase {
                                        (id, street, number, postal, city)
                                        values
                                        (@id, @street, @number, @postal, @city)`);
-            return true;
+            return res.rowsAffected[0] != 0;
         }
         catch (err) {
             console.log(err);
