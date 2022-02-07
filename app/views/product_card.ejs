@@ -49,6 +49,7 @@
                     <% if (user.id) {%>
                         <li>
                             <form method="post" action="/checkout/<%- user.id %>/<%- product.id %>">
+                                <input type="number" name="amount" min="1" max="<%=product.amount%>">
                                 <button type="submit">Dodaj do koszyka</button>
                             </form>
                         </li>
