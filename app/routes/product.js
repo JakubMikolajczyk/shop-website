@@ -12,6 +12,8 @@ let storage = multer.diskStorage({
     }
 })
 let upload = multer( {storage: storage} );
+let validators = require("../validator");
+const e = require('express');
 
 router.get("/products", async (req, res) => {
     let products = await db.ProductDatabase.read({valid: 1});
@@ -25,7 +27,7 @@ router.post("/products", upload.single("image"), async (req, res) => {
     }
     else {
         let categories = await db.CategoryDatabase.read();
-        res.render("product_editor", { user: { id: 2,  username: "Wiktor", isAdmin: true}, message: {},  })
+        res.render("product_editor", { user: { id: 2,  username: "Wiktor", isAdmin: true}, message: {}, prev: {} })
     }
 });
 
@@ -50,19 +52,25 @@ router.post("/products/:id", async function (req,res) {
 
 router.delete("/products/:id", productDeleteHandler);
 
-
-
 async function productAddHandler(req, res) {
     let product = req.body;
     product.category_id = 1;
-    console.log(product);
-    if (await db.ProductDatabase.add(product)) {
-        await fs.promises.rename("./database/photos/" + req.file.filename, "./database/photos/" + product.id + ".png");
-        return res.send("User added");
+    let message = validators.validProduct(product);
+    if (req.file === undefined) {
+        message.error = true;
+        message.file = "You must attach an image!";
+    }
+    if (message.error) {
+        res.render("product_editor", { prev: product, user: { id: 2,  username: "Wiktor", isAdmin: true}, message: message })
+        await fs.promises.delete("./database/photos/" + req.file.filename);
     }
     else {
-        return res.redirect("/products");
+        if (await db.ProductDatabase.add(product)) {
+            await fs.promises.rename("./database/photos/" + req.file.filename, "./database/photos/" + product.id + ".png");
+            return res.send("User added");
+        }
     }
+    return res.redirect("/products");
 }
 
 async function productDeleteHandler(req, res) {
