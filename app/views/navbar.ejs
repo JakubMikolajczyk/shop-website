@@ -72,18 +72,39 @@
             display: none;
             position: absolute;
             background-color: #f9f9f9;
-            min-width: 160px;
+            min-width: 200px;
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
             z-index: 1;
         }
 
-        .dropdown-content a {
+        .but{
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            background-color: #f9f9f9;
+            font-size: 17px;
             float: none;
             color: black;
             padding: 12px 16px;
             text-decoration: none;
             display: block;
             text-align: left;
+            min-width: 200px;
+            border: none;
+            outline: none;
+        }
+
+
+
+        .dropdown-content a{
+            float: none;
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+        }
+
+        .but:hover {
+            background-color: #ddd;
         }
 
         .dropdown-content a:hover {
@@ -114,20 +135,54 @@
 
         <div class="dropdown-content">
             <% if (user.login !== '') {%>
-                <a href="/settings">Ustawienia</a>
-                <a href="/favourite">Obserwacje</a>
-                <a href="/checkout">Koszyk</a>
-                <a href="/orders">Historia zamówień</a>
+
+                <form action="/users/:<%=user.id%>/settings" method="GET">
+                    <button class="but" type="submit">Ustawienia</button>
+                </form>
+
+                <form action="/favourites/:<%=user.id%>" method="GET">
+                    <button class="but" type="submit">Obserwacje</button>
+                </form>
+
+                <form action="/checkout/:<%=user.id%>" method="GET">
+                    <button class="but" type="submit">Koszyk</button>
+                </form>
+
+                <form action="/orders/:<%=user.id%>" method="GET">
+                    <button class="but" type="submit">Historia zamówień</button>
+                </form>
+
+
                 <% if (user.isAdmin){%>
-                    <a href="/orders">Lista zamówień</a>
-                    <a href="/users">Lista użytkowników</a>
-                    <a href="/product">Dodaj produkt</a>
+
+                    <form action="/orders" method="GET">
+                        <button class="but" type="submit">Lista zamówień</button>
+                    </form>
+
+
+                    <form action="/users" method="GET">
+                        <button class="but" type="submit">Lista użytkowników</button>
+                    </form>
+
+
+                    <form action="/products" method="POST">
+                        <button class="but" type="submit">Dodaj produkt</button>
+                    </form>
+
                 <%}%>
 
-                <a href="/users/logout">Wyloguj się</a>
+                <form action="/users/logout" method="GET">
+                    <button class="but" type="submit">Wyloguj się</button>
+                </form>
+
             <% } else {%>
-                <a href="/users/login">Zaloguj się</a>
-                <a href="/users/register">Zarejestruj się</a>
+                    <form action="/users/login" method="GET">
+                        <button class="but" type="submit">Zaloguj się</button>
+                    </form>
+
+                    <form action="/users/register" method="GET">
+                        <button class="but" type="submit">Zarejestruj się</button>
+                    </form>
             <%}%>
         </div>
 
@@ -139,19 +194,15 @@
     <% } %>
 
     <div class="search">
-        <form action="/" method="post">
-            <input type="text" id="user" name="user">
+        <form action="/products/search" method="post">
+            <input type="text" name="search">
             <button type="submit">Wyszukaj</button>
         </form>
 
     </div>
 
+</div>
 
-
-    </div>
-    <form method="post" action="/products">
-        <button type="submit">Dodawanie produkt</button>
-    </form>
 </body>
 
 </html>
