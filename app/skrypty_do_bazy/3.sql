@@ -1,7 +1,7 @@
 USE [weppo]
 GO
 
-/****** Object:  Table [dbo].[USER]    Script Date: 06.02.2022 21:57:15 ******/
+/****** Object:  Table [dbo].[USER]    Script Date: 07.02.2022 01:56:00 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -11,12 +11,16 @@ GO
 CREATE TABLE [dbo].[USER](
 	[id] [int] IDENTITY(1,1) NOT NULL,
 	[login] [nvarchar](20) NOT NULL,
-	[password] [nvarchar](50) NOT NULL,
+	[password] [nvarchar](100) NOT NULL,
 	[isAdmin] [bit] NOT NULL,
 	[valid] [bit] NOT NULL,
  CONSTRAINT [PK_USER] PRIMARY KEY CLUSTERED 
 (
 	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+UNIQUE NONCLUSTERED 
+(
+	[login] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
