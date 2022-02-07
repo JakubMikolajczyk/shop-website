@@ -13,44 +13,53 @@ let storage = multer.diskStorage({
 })
 let upload = multer( {storage: storage} );
 let validators = require("../validator");
-const e = require('express');
+let authorize = require("../authorize");
 
-router.get("/products", async (req, res) => {
+router.get("/products", authorize.any,  async (req, res) => {
     let products = await db.ProductDatabase.read({valid: 1});
-    res.render("product_tile", {array: products, user: { id: 2,  username: "Wiktor", isAdmin: true}});
+    res.render("product_tile", {array: products, user: req.user});
 });
 
-router.post("/products", upload.single("image"), async (req, res) => {
+router.post("/products", authorize.isAdmin, upload.single("image"), async (req, res) => {
     console.log(req.body);
     if (req.body.method == "PUT") {
         return productAddHandler(req, res);
     }
     else {
         let categories = await db.CategoryDatabase.read();
-        res.render("product_editor", { user: { id: 2,  username: "Wiktor", isAdmin: true}, message: {}, prev: {} })
+        res.render("product_editor", { user: req.user, message: {}, prev: {} })
     }
 });
 
-router.get("/products/:id", async (req,res) => {
+router.get("/products/:id", authorize.any, async (req,res) => {
     let result = await db.ProductDatabase.read({id: req.params.id, valid: true});
-    res.render("product_card", { user: { id: 2,  username: "Wiktor", isAdmin: true}, product: result[0] });
+    if (result.length == 0) {
+        return res.redirect("/");
+    }
+    res.render("product_card", { user: req.user, product: result[0] });
 });
 
-router.post("/products/:id", async function (req,res) {
+router.post("/products/:id", authorize.isAdmin, upload.single("image"), async (req,res) => {
+    console.log(req.body);
     if (req.body.method == "DELETE") {
         return productDeleteHandler(req, res);
     }
     else if (req.body.method == "PUT") {
-        res.send("PUT method");
+        req.body.id = req.params.id;
+        return productEditHandler(req, res);
     }
     else {
-        res.send("POST method");
+        let result = await db.ProductDatabase.read({ valid: 1, id: req.params.id });
+        if (result.length == 0) {
+            return res.redirect("/");
+        }
+        let productToEdit = result[0];
+        res.render("product_editor", { prev: productToEdit, user: req.user, message: {} });
     }
 });
 
-//router.put()
-
-router.delete("/products/:id", productDeleteHandler);
+router.put("/products/:id", authorize.isAdmin, productEditHandler);
+router.delete("/products/:id", authorize.isAdmin, productDeleteHandler);
 
 async function productAddHandler(req, res) {
     let product = req.body;
@@ -61,13 +70,33 @@ async function productAddHandler(req, res) {
         message.file = "You must attach an image!";
     }
     if (message.error) {
-        res.render("product_editor", { prev: product, user: { id: 2,  username: "Wiktor", isAdmin: true}, message: message })
+        res.render("product_editor", { prev: product, user: req.user, message: message });
         await fs.promises.delete("./database/photos/" + req.file.filename);
     }
     else {
         if (await db.ProductDatabase.add(product)) {
             await fs.promises.rename("./database/photos/" + req.file.filename, "./database/photos/" + product.id + ".png");
-            return res.send("User added");
+            return res.redirect("/products");
+        }
+    }
+    return res.redirect("/products");
+}
+
+async function productEditHandler(req, res) {
+    let product = req.body;
+    product.category_id = 1;
+    let message = validators.validProduct(product);
+    if (message.error) {
+        res.render("product_editor", { prev: product, user: req.user, message: message});
+    }
+    else {
+        console.log(product);
+        if (await db.ProductDatabase.update(product)) {
+            if (req.file !== undefined) {
+                await fs.promises.delete("./database/photos/" + product.id + ".png");
+                await fs.promises.rename("./database/photos/" + req.file.filename, "./database/photos/" + product.id + ".png");
+            }
+            return res.redirect("/products");
         }
     }
     return res.redirect("/products");
