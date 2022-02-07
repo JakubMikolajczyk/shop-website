@@ -20,38 +20,47 @@ let userSetting = {
 // }
 
 function validUser(user){
-    let message ={}
+    let message = {}
+    message.error = false
 
-    if(user.phone !== 9){
+    if(user.phone.length !== 9){
+        message.error = true
         message.phone = "Phone must contain exactly 9 numbers"
     }
 
     if(!Number(user.phone)){
+        message.error = true
         message.phone = "Phone must be number"
     }
 
-    if(user.postal !== 9){
-        message.postal = "Phone must contain exactly 9 numbers"
+    if(user.postal.length !== 5){
+        message.error = true
+        message.postal = "Phone must contain exactly 5 numbers"
     }
 
     if(!Number(user.postal)){
+        message.error = true
         message.postal = "Phone must be number"
     }
 
     for (let i in userSetting){
         if (user[i] === ''){
+            message.error = true
             message[i] = i + " cannot be empty"
         }
         if (user[i].length > userSetting[i]){
+            message.error = true
             message[i] = i + " is too long"
         }
     }
 
     if (user.password !== user.againpassword){
+        message.error = true
         message.password = "Two difference "
     }
 
-    if (user.password === '' || use.againpassword === ''){
+    if (user.password === '' || user.againpassword === ''){
+        message.error = true
         message.password = "Password cannot be empty"
     }
 
