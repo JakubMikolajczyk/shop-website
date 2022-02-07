@@ -61,19 +61,12 @@ async function productAddHandler(req, res) {
         message.file = "You must attach an image!";
     }
     if (message.error) {
-<<<<<<< Updated upstream
-        res.render("product_editor", { prev: product, user: { id: 2,  username: "Wiktor", isAdmin: true}, message: message })
-=======
->>>>>>> Stashed changes
         await fs.promises.delete("./database/photos/" + req.file.filename);
         res.render("product_editor", { prev: product, user: req.user, message: message });
     }
     else {
         if (await db.ProductDatabase.add(product)) {
             await fs.promises.rename("./database/photos/" + req.file.filename, "./database/photos/" + product.id + ".png");
-<<<<<<< Updated upstream
-            return res.send("User added");
-=======
             return res.redirect("/products");
         }
     }
@@ -95,7 +88,6 @@ async function productEditHandler(req, res) {
                 await fs.promises.rename("./database/photos/" + req.file.filename, "./database/photos/" + product.id + ".png");
             }
             return res.redirect("/products");
->>>>>>> Stashed changes
         }
     }
     return res.redirect("/products");
