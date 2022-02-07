@@ -46,7 +46,7 @@
                     <li>
                         <%- product.price %>
                     </li>
-                    <% if (user.username !="" ) {%>
+                    <% if (user.id) {%>
                         <li>
                             <form method="post" action="/checkout/<%- user.id %>/<%- product.id %>">
                                 <button type="submit">Dodaj do koszyka</button>

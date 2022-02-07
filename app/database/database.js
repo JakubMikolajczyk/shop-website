@@ -283,7 +283,6 @@ class ProductDatabase {
             product.name === undefined || 
             product.price === undefined || 
             product.amount === undefined || 
-            product.img_path === undefined || 
             product.description === undefined || 
             product.category_id === undefined) {
                 return false;
@@ -293,14 +292,16 @@ class ProductDatabase {
             req.input("name", product.name);
             req.input("price", product.price);
             req.input("amount", product.amount);
-            req.input("img_path", product.img_path);
             req.input("description", product.description);
             req.input("category_id", product.category_id);
 
             let res = await req.query(`insert into [PRODUCT]
-                                 (name, price, amount, img_path, description, category_id, valid)
+                                 (name, price, amount, description, category_id, valid)
                                  values
-                                 (@name, @price, @amount, @img_path, @description, @category_id, 1)`);
+                                 (@name, @price, @amount, @description, @category_id, 1)
+                                 select scope_identity() as id;
+                                 `);
+            product.id = res.recordset[0].id;
             return res.rowsAffected[0] != 0;
         }
         catch (err) {

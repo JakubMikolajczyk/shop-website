@@ -1,21 +1,32 @@
 let express = require('express');
 let router = express.Router();
 let db = require("../database/database");
+let multer = require("multer");
+let fs = require("fs");
+let storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "./database/photos");
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now()+ ".png");
+    }
+})
+let upload = multer( {storage: storage} );
 
 router.get("/products", async (req, res) => {
-    let user = {
-        login: "login",
-        password: "12345",
-        isAdmin: false
-    }
-    await db.UserDatabase.add(user);
-    await db.UserDatabase.add(user);
     let products = await db.ProductDatabase.read({valid: 1});
     res.render("product_tile", {array: products, user: { id: 2,  username: "Wiktor", isAdmin: true}});
 });
 
-router.post("/products", async (req, res) => {
-
+router.post("/products", upload.single("image"), async (req, res) => {
+    console.log(req.body);
+    if (req.body.method == "PUT") {
+        return productAddHandler(req, res);
+    }
+    else {
+        let categories = await db.CategoryDatabase.read();
+        res.render("product_editor", { user: { id: 2,  username: "Wiktor", isAdmin: true}, message: {},  })
+    }
 });
 
 router.get("/products/:id", async (req,res) => {
@@ -41,7 +52,18 @@ router.delete("/products/:id", productDeleteHandler);
 
 
 
-
+async function productAddHandler(req, res) {
+    let product = req.body;
+    product.category_id = 1;
+    console.log(product);
+    if (await db.ProductDatabase.add(product)) {
+        await fs.promises.rename("./database/photos/" + req.file.filename, "./database/photos/" + product.id + ".png");
+        return res.send("User added");
+    }
+    else {
+        return res.redirect("/products");
+    }
+}
 
 async function productDeleteHandler(req, res) {
     if (await db.ProductDatabase.delete(req.params.id)) {

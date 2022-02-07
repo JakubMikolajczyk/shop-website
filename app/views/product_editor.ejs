@@ -7,8 +7,31 @@
     <title>Document</title>
 </head>
 <body>
-    <form method="post" action>
-        <button type="submit"></button>
-    </form>
-</body>
+
+    <%- include('navbar') %>
+    <div>
+        <form enctype="multipart/form-data" method="POST" >
+            <input hidden="true" name="method" value="PUT">
+            <label for="name"> Nazwa: </label>
+            <input type="text" name="name"> <span style="color: red"> <%=message.login%></span><br>
+    
+            <label for="price"> Cena: </label>
+            <input type="number" name="price"> <span style="color: red"> <%=message.password%></span> <br>
+    
+            <label for="amount"> Ilość: </label>
+            <input type="number" name="amount"> <span style="color: red"> <%=message.password%></span> <br>
+    
+            <label for="image"> Zdjęcie produktu: </label>
+            <input type="file" name="image"> <span style="color: red"> <%=message.name%></span> <br>
+    
+            <label for="description"> Opis: </label>
+            <input type="text" name="description"> <span style="color: red"> <%=message.surname%></span> <br>
+    
+            <button type="submit"> Dodaj produkt </button>
+    
+        </form>
+    </div>
+    
+    
+    </body>
 </html>
