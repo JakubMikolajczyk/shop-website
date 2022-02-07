@@ -114,6 +114,7 @@ class UserDatabase {
                                        values
                                        (@id, @name, @surname, @phone, @mail)`
             );
+            return res.rowsAffected[0] != 0;
         }
         catch (err) {
             console.log(err);
