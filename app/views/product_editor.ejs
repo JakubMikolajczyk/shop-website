@@ -1,37 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
-<body>
 
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
     <%- include('navbar') %>
-    <div>
-        <form enctype="multipart/form-data" method="POST" >
-            <input hidden="true" name="method" value="PUT">
-            <label for="name"> Nazwa: </label>
-            <input type="text" name="name" value="<%- prev.name %>"> <span style="color: red"> <%=message.name%></span><br>
-    
-            <label for="price"> Cena: </label>
-            <input type="number" name="price"> <span style="color: red"> <%=message.price%></span> <br>
-    
-            <label for="amount"> Ilość: </label>
-            <input type="number" name="amount"> <span style="color: red"> <%=message.amount%></span> <br>
-    
-            <label for="image"> Zdjęcie produktu: </label>
-            <input type="file" name="image"> <span style="color: red"> <%=message.file%></span> <br>
-    
-            <label for="description"> Opis: </label>
-            <input type="text" name="description"> <span style="color: red"> <%=message.description%></span> <br>
-    
-            <button type="submit"> Dodaj produkt </button>
-    
-        </form>
-    </div>
-    
-    
-    </body>
+        <div>
+            <script>
+                function click() {
+                    let name = document.getElementsByName("name")[0];
+                    axios({
+                        method: "put",
+                        url: "/prod"
+                    }).then(res => {
+                        console.log(res);
+                    });
+                }
+            </script>
+            <form enctype="multipart/form-data" method="POST">
+                <input hidden="true" name="method" value="PUT">
+                <label for="name"> Nazwa: </label>
+                <input type="text" name="name" value="<%- prev.name %>"> <span style="color: red">
+                    <%=message.name%>
+                </span><br>
+
+                <label for="price"> Cena: </label>
+                <input type="number" name="price" value="<%- prev.price %>"> <span style="color: red">
+                    <%=message.price%>
+                </span> <br>
+
+                <label for="amount"> Ilość: </label>
+                <input type="number" name="amount" value="<%- prev.amount %>"> <span style="color: red">
+                    <%=message.amount%>
+                </span> <br>
+
+                <label for="image"> Zdjęcie produktu: </label>
+                <input type="file" name="image"> <span style="color: red">
+                    <%=message.file%>
+                </span> <br>
+
+                <label for="description"> Opis: </label>
+                <input type="text" name="description" value="<%- prev.description %>"> <span style="color: red">
+                    <%=message.description%>
+                </span> <br>
+
+                
+            </form>
+            <button onclick="click"> Gotowe </button>
+            
+        </div>
+
+
+</body>
+
 </html>

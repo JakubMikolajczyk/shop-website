@@ -15,7 +15,8 @@ let upload = multer( {storage: storage} );
 let validators = require("../validator");
 const e = require('express');
 
-router.get("/products", async (req, res) => {
+
+router.get("/products", authorize.any,  async (req, res) => {
     let products = await db.ProductDatabase.read({valid: 1});
     res.render("product_tile", {array: products, user: { id: 2,  username: "Wiktor", isAdmin: true}});
 });
@@ -26,12 +27,14 @@ router.post("/products", upload.single("image"), async (req, res) => {
         return productAddHandler(req, res);
     }
     else {
-        let categories = await db.CategoryDatabase.read();
-        res.render("product_editor", { user: { id: 2,  username: "Wiktor", isAdmin: true}, message: {}, prev: {} })
+        //let categories = await db.CategoryDatabase.read();
+        res.render("product_editor", { user: req.user, message: {}, prev: {} })
     }
 });
 
-router.get("/products/:id", async (req,res) => {
+
+
+router.get("/products/:id", authorize.any, async (req,res) => {
     let result = await db.ProductDatabase.read({id: req.params.id, valid: true});
     res.render("product_card", { user: { id: 2,  username: "Wiktor", isAdmin: true}, product: result[0] });
 });
@@ -48,9 +51,14 @@ router.post("/products/:id", async function (req,res) {
     }
 });
 
-//router.put()
+router.put("/prod", async (req, res) => {
+    console.log("here");
+    let result = await db.ProductDatabase.read();
+    res.send(result);
+})
 
-router.delete("/products/:id", productDeleteHandler);
+router.put("/products/:id", authorize.isAdmin, productEditHandler);
+router.delete("/products/:id", authorize.isAdmin, productDeleteHandler);
 
 async function productAddHandler(req, res) {
     let product = req.body;
