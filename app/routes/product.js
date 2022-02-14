@@ -19,8 +19,7 @@ let authorize = require("../authorize");
 
 // zwraca wszystkie produkty
 router.get("/", authorize.any,  async (req, res) => {
-    let products = await db.ProductDatabase.read({valid: 1});
-    res.render("product_tile", {array: products, user: req.user});
+    res.redirect("/products/search");
 });
 
 
@@ -36,6 +35,15 @@ router.post("/", authorize.isAdmin, upload.single("image"), async (req, res) => 
     }
 });
 
+router.get("/search", authorize.any, async (req, res) => {
+    let products = await db.ProductDatabase.read({valid: 1});
+    return res.render("product_tile", {array: products, user: req.user});
+});
+
+router.post("/search", authorize.any, async (req, res) => {
+    let query = req.body.search;
+    
+});
 
 // zwraca kartę produktu
 router.get("/:id", authorize.any, async (req,res) => {
@@ -44,8 +52,7 @@ router.get("/:id", authorize.any, async (req,res) => {
 });
 
 
-router.post("/:id", authorize.isAdmin, upload.single("image"), async function (req,res) {
-    console.log(req.body);
+router.post("/:id", authorize.isAdmin, upload.single("image"), async (req,res) => {
     // usuwa dany produkt
     if (req.body.method == "DELETE") {
         return productDeleteHandler(req, res);
@@ -63,6 +70,8 @@ router.post("/:id", authorize.isAdmin, upload.single("image"), async function (r
 
 router.put("/:id", authorize.isAdmin, productEditHandler);
 router.delete("/:id", authorize.isAdmin, productDeleteHandler);
+
+
 
 async function productAddHandler(req, res) {
     let product = req.body;
@@ -97,7 +106,6 @@ async function productEditHandler(req, res) {
     else {
         if (await db.ProductDatabase.update(product)) {
             if (req.file !== undefined) {
-                console.log("File found");
                 await fs.promises.unlink(`./database/photos/${product.id}.png`);
                 await fs.promises.rename("./database/photos/" + req.file.filename, "./database/photos/" + product.id + ".png");
             }
