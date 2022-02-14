@@ -15,14 +15,16 @@ let upload = multer( {storage: storage} );
 let validators = require("../validator");
 let authorize = require("../authorize");
 
+
+
 // zwraca wszystkie produkty
-router.get("/products", authorize.any,  async (req, res) => {
+router.get("/", authorize.any,  async (req, res) => {
     let products = await db.ProductDatabase.read({valid: 1});
-    res.render("product_tile", {array: products, user: { id: 2,  username: "Wiktor", isAdmin: true}});
+    res.render("product_tile", {array: products, user: req.user});
 });
 
 
-router.post("/products", authorize.isAdmin, upload.single("image"), async (req, res) => {
+router.post("/", authorize.isAdmin, upload.single("image"), async (req, res) => {
     // tworzy nowy produkt
     if (req.body.method == "PUT") {
         return productAddHandler(req, res);
@@ -36,13 +38,13 @@ router.post("/products", authorize.isAdmin, upload.single("image"), async (req, 
 
 
 // zwraca kartę produktu
-router.get("/products/:id", authorize.any, async (req,res) => {
+router.get("/:id", authorize.any, async (req,res) => {
     let result = await db.ProductDatabase.read({id: req.params.id, valid: true});
     res.render("product_card", { user: req.user, product: result[0], message: "" });
 });
 
 
-router.post("/products/:id", authorize.isAdmin, upload.single("image"), async function (req,res) {
+router.post("/:id", authorize.isAdmin, upload.single("image"), async function (req,res) {
     console.log(req.body);
     // usuwa dany produkt
     if (req.body.method == "DELETE") {
@@ -59,8 +61,8 @@ router.post("/products/:id", authorize.isAdmin, upload.single("image"), async fu
     }
 });
 
-router.put("/products/:id", authorize.isAdmin, productEditHandler);
-router.delete("/products/:id", authorize.isAdmin, productDeleteHandler);
+router.put("/:id", authorize.isAdmin, productEditHandler);
+router.delete("/:id", authorize.isAdmin, productDeleteHandler);
 
 async function productAddHandler(req, res) {
     let product = req.body;
@@ -90,7 +92,7 @@ async function productEditHandler(req, res) {
 
     let message = validators.validProduct(product);
     if (message.error) {
-        res.render("product_editor", { prev: product, user: req.user, message: message});
+        return res.render("product_editor", { prev: product, user: req.user, message: message});
     }
     else {
         if (await db.ProductDatabase.update(product)) {

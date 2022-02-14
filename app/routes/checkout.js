@@ -2,9 +2,8 @@ let express = require('express')
 let router = express.Router()
 let db = require("../database/database")
 let authorize = require('../authorize')
-const {isUser} = require("../authorize");
 
-router.get('/', isUser, (req, res) => {
+router.get('/', authorize.isUser, (req, res) => {
     return res.redirect('/checkout/' + req.user.id)
 })
 
