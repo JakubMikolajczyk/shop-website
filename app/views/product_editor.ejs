@@ -9,20 +9,8 @@
 </head>
 
 <body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
     <%- include('navbar') %>
         <div>
-            <script>
-                function click() {
-                    let name = document.getElementsByName("name")[0];
-                    axios({
-                        method: "put",
-                        url: "/prod"
-                    }).then(res => {
-                        console.log(res);
-                    });
-                }
-            </script>
             <form enctype="multipart/form-data" method="POST">
                 <input hidden="true" name="method" value="PUT">
                 <label for="name"> Nazwa: </label>
@@ -50,10 +38,9 @@
                     <%=message.description%>
                 </span> <br>
 
+                <button type="submit"> Gotowe </button>
                 
             </form>
-            <button onclick="click"> Gotowe </button>
-            
         </div>
 
 

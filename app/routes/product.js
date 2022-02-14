@@ -13,19 +13,21 @@ let storage = multer.diskStorage({
 })
 let upload = multer( {storage: storage} );
 let validators = require("../validator");
-const e = require('express');
+let authorize = require("../authorize");
 
-
+// zwraca wszystkie produkty
 router.get("/products", authorize.any,  async (req, res) => {
     let products = await db.ProductDatabase.read({valid: 1});
     res.render("product_tile", {array: products, user: { id: 2,  username: "Wiktor", isAdmin: true}});
 });
 
-router.post("/products", upload.single("image"), async (req, res) => {
-    console.log(req.body);
+
+router.post("/products", authorize.isAdmin, upload.single("image"), async (req, res) => {
+    // tworzy nowy produkt
     if (req.body.method == "PUT") {
         return productAddHandler(req, res);
     }
+    // zwraca kreator produktu
     else {
         //let categories = await db.CategoryDatabase.read();
         res.render("product_editor", { user: req.user, message: {}, prev: {} })
@@ -33,29 +35,29 @@ router.post("/products", upload.single("image"), async (req, res) => {
 });
 
 
-
+// zwraca kartę produktu
 router.get("/products/:id", authorize.any, async (req,res) => {
     let result = await db.ProductDatabase.read({id: req.params.id, valid: true});
-    res.render("product_card", { user: { id: 2,  username: "Wiktor", isAdmin: true}, product: result[0] });
+    res.render("product_card", { user: req.user, product: result[0], message: "" });
 });
 
-router.post("/products/:id", async function (req,res) {
+
+router.post("/products/:id", authorize.isAdmin, upload.single("image"), async function (req,res) {
+    console.log(req.body);
+    // usuwa dany produkt
     if (req.body.method == "DELETE") {
         return productDeleteHandler(req, res);
     }
+    // aktualizuje produkt
     else if (req.body.method == "PUT") {
-        res.send("PUT method");
+        return productEditHandler(req, res);
     }
+    // zwraca formularz edycji przedmiotu
     else {
-        res.send("POST method");
+        let product = await db.ProductDatabase.read({id: req.params.id});
+        res.render("product_editor", { user: req.user, message: {}, prev: product[0] });
     }
 });
-
-router.put("/prod", async (req, res) => {
-    console.log("here");
-    let result = await db.ProductDatabase.read();
-    res.send(result);
-})
 
 router.put("/products/:id", authorize.isAdmin, productEditHandler);
 router.delete("/products/:id", authorize.isAdmin, productDeleteHandler);
@@ -69,7 +71,7 @@ async function productAddHandler(req, res) {
         message.file = "You must attach an image!";
     }
     if (message.error) {
-        await fs.promises.delete("./database/photos/" + req.file.filename);
+        await fs.promises.unlink("./database/photos/" + req.file.filename);
         res.render("product_editor", { prev: product, user: req.user, message: message });
     }
     else {
@@ -83,19 +85,24 @@ async function productAddHandler(req, res) {
 
 async function productEditHandler(req, res) {
     let product = req.body;
+    product.id = req.params.id;
     product.category_id = 1;
+
     let message = validators.validProduct(product);
     if (message.error) {
         res.render("product_editor", { prev: product, user: req.user, message: message});
     }
     else {
-        console.log(product);
         if (await db.ProductDatabase.update(product)) {
             if (req.file !== undefined) {
-                await fs.promises.delete(`./database/photos/${product.id}.png`);
+                console.log("File found");
+                await fs.promises.unlink(`./database/photos/${product.id}.png`);
                 await fs.promises.rename("./database/photos/" + req.file.filename, "./database/photos/" + product.id + ".png");
             }
             return res.redirect("/products");
+        }
+        else {
+            console.log("Couldnt update");
         }
     }
     return res.redirect("/products");
@@ -106,7 +113,8 @@ async function productDeleteHandler(req, res) {
         return res.redirect("/products")
     }
     else {
-        return res.redirect("/products/" + req.params.id);
+        let product = await db.ProductDatabase.read({id: req.params.id});
+        return res.render("product_card", {user: req.user, message: "Couldn't delete this item.", product: product});
     }
 }
 
