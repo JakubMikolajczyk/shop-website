@@ -421,6 +421,23 @@ class ProductDatabase {
             return [];
         }
     }
+
+    static async search(query) {
+        try {
+            let req = new mssql.Request();
+            req.input("query", query);
+            let res = await req.query(`select * from [PRODUCT]
+                                       where 
+                                       valid = 1 AND
+                                       (name LIKE '%' + @query+ '%' OR
+                                       description LIKE '%' + @query + '%')`);
+            return res.recordset;
+        }
+        catch (err) {
+            console.log(err);
+            return [];
+        }
+    }
 }
 
 class OrderDatabase {

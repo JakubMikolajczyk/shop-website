@@ -7,7 +7,7 @@ mssql.connect("server=localhost,1433;database=weppo;user id=admin;password=admin
         console.log(err);
     }
     else {
-        let cart = await db.CartDatabase.getCart(3);
+        let cart = await db.ProductDatabase.search("ad");
         console.log(cart);
     }
 })
