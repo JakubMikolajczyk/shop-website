@@ -79,7 +79,7 @@ router.post('/login', authorize.isUnlogged, async (req, res) => {
 
 })
 
-router.get('/logout', authorize.any, (req, res) => {
+router.get('/logout', authorize.isUser, (req, res) => {
     res.cookie('user','', { maxAge: -1 });
     res.redirect('/')
 

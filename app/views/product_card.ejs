@@ -37,14 +37,14 @@
             <div class="image">
                 <img src="http://localhost:3000/image/<%- product.id %>.png" alt="Unable to load the image.">
             </div>
-
+            <%= message %>
             <div class="basic">
                 <span>
                     <%= product.name %>
                 </span>
                 <ul>
                     <li>
-                        <%- product.price %>
+                        <%- (product.price / 100).toFixed(2) %>
                     </li>
                     <% if (user.id) {%>
                         <li>

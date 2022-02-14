@@ -76,7 +76,7 @@
                             <%= array[i].name %>
                         </div>
                         <div class="price">
-                            Cena: <%= array[i].price %>
+                            Cena: <%= (array[i].price / 100).toFixed(2) %>
                         </div>
                         <div class="details">
                             <a href="/products/<%- array[i].id %>"> Pokaż szczegóły </a>

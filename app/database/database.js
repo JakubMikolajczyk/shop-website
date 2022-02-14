@@ -259,7 +259,7 @@ class ProductDatabase {
                                        (product.price !== undefined ? " AND [PRODUCT].price = @price" : "") +
                                        (product.amount !== undefined ? " AND [PRODUCT].amount = @amount" : "") +
                                        (product.img_path !== undefined ? " AND [PRODUCT].img_path = @img_path" : "") +
-                                       //(product.description ? " AND [PRODUCT].description = @description" : "") +
+                                       (product.description !== undefined ? " AND [PRODUCT].description LIKE @description" : "") +
                                        (product.category_id !== undefined ? " AND [CATEGORY].id = @category_id" : "") +
                                        (product.category !== undefined ? " AND [CATEGORY].name = @category" : "") + 
                                        (product.valid !== undefined ? " AND [PRODUCT].valid = @valid" : "")
@@ -316,27 +316,24 @@ class ProductDatabase {
             product.name === undefined || 
             product.price === undefined || 
             product.amount === undefined || 
-            product.img_path === undefined || 
             product.description === undefined || 
             product.category_id === undefined) {
                 return false;
         }
         try {
-            let req = mssql.Request();
+            let req = new mssql.Request();
             req.input("id", product.id);
             req.input("name", product.name);
             req.input("price", product.price);
             req.input("amount", product.amount);
-            req.input("img_path", product.img_path);
             req.input("description", product.description);
             req.input("category_id", product.category_id);
 
-            let res = req.query(`update [PRODUCT]
+            let res = await req.query(`update [PRODUCT]
                                  set
                                  name=@name,
                                  price=@price,
                                  amount=@amount,
-                                 img_path=@img_path,
                                  description=@description,
                                  category_id=@category_id
                                  where id=@id`);
@@ -824,6 +821,27 @@ class CartDatabase {
         catch (err) {
             console.log(err);
             return false;
+        }
+    }
+
+    static async getCart(user_id) {
+        try {
+            let req = new mssql.Request();
+            req.input("user_id", user_id);
+
+            let res = await req.query(`select * from [PRODUCT]
+                                       left join [CART] on [PRODUCT].id = [CART].product_id
+                                       where user_id = @user_id`);
+            let result = res.recordset;
+            result.map(product => {
+                product.user_amount = product.amount[1];
+                product.amount = product.amount[0];
+            })
+            return result;
+        }
+        catch (err) {
+            console.log(err);
+            return [];
         }
     }
 }
