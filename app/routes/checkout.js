@@ -8,9 +8,7 @@ router.get('/', authorize.isUser, (req, res) => {
 })
 
 router.get('/:user_id', authorize.isUser, async (req, res) => {
-
-    let result = await db.CartDatabase.read({id: req.params.id})
-    console.log(result)
+    let result = await db.CartDatabase.getCart(req.params.user_id)
     res.render('checkout', {
         user: req.user,
         checkout: result
