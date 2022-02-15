@@ -8,11 +8,12 @@ router.get('/', authorize.isUser, (req, res) => {
 })
 
 router.get('/:user_id', authorize.isUser, async (req, res) => {
+
     let result = await db.CartDatabase.getCart(req.params.user_id)
     res.render('checkout', {
         user: req.user,
         checkout: result
-    }) //TODO
+    })
 
 })
 
@@ -33,6 +34,8 @@ router.get('/:user_id/:product_id', authorize.isUser, async (req, res) => {
 
 router.post('/:user_id/:product_id', authorize.isUser, async (req, res) => {
 
+    console.log("abc")
+
     if (req.body.method === 'DELETE'){
         return deleteProductFromCheckout(req, res)
     }
@@ -45,10 +48,10 @@ router.post('/:user_id/:product_id', authorize.isUser, async (req, res) => {
             product_id: req.params.product_id,
             amount: req.body.amount
         })){
-            res.send("DODANO") //TODO
+            res.status(200).send()
         }
         else {
-            res.send("ERROR")
+            res.status(404).send()
         }
     }
 
@@ -60,16 +63,19 @@ router.delete('/:user_id/:product_id', authorize.isUser, deleteProductFromChecko
 
 async function deleteCheckout(req, res){
     if(await db.CartDatabase.delete(req.params.id)){
-        return res.redirect('/')
+        res.status(200).send()
     }
     else {
-        return res.redirect(404, 'err')
+        res.status(404).send()
     }
 }
 
 async function deleteProductFromCheckout(req, res){
     if (await db.CartDatabase.remove({user_id: req.params.user_id, product_id: req.params.product_id})){
-        return res.redirect('/checkout')
+            res.status(200).send()
+    }
+    else {
+        res.status(404).send()
     }
 }
 
@@ -79,10 +85,10 @@ async function updateCheckout(req, res){
         product_id: req.params.product_id,
         amount: req.body.amount
     })){
-      res.send("UPDATE") //TODO
+        res.status(200).send()
     }
     else {
-        res.send("ERROR")
+        res.status(404).send()
     }
 }
 

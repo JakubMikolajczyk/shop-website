@@ -17,66 +17,189 @@
 
     }
 
-    .container{
+    .container {
         width: 100%;
     }
 
-    .left{
+    .left {
         float: left;
     }
 
-    .right{
+    .right {
         float: right;
     }
 
-    .checkoutSummary{
+    .checkoutSummary {
         float: right;
         width: 28%;
         position: fixed;
         right: 0;
-        top: 70px;
+        top: 125px;
         border-style: groove;
         border-color: yellow;
 
     }
+
+    #message {
+        text-align: center;
+        border-style: groove;
+        border-color: red;
+        font-size: 30px;
+    }
 </style>
 
-<div>
-    <div class="left" style="width: 70%">
-        <ul>
-            <% checkout.forEach( product => {
-            %>
 
-            <li>
-                <div class="container">
-                    <div class="left">
-                        <a href="http://localhost:3000/products/<%=product.product_id%>">Nazwa produktu</a>
+<div id="empty" style="visibility: visible;">
+    Pusty koszyk
+</div>
+
+<div id="checkout" style="visibility: hidden">
+
+    <div id="message">Koszyk</div>
+
+
+    <div>
+        <div class="left" style="width: 70%">
+            <ul>
+                <% checkout.forEach( product => {
+                %>
+
+                <li name="product">
+                    <div class="container">
+                        <div name="" class="left">
+                            <a href="http://localhost:3000/products/<%= product.product_id %>"><%= product.name %></a>
+                        </div>
+
+                        <div name="" class="right">
+                            <span id="price"><%= (product.price / 100).toFixed(2) %></span>
+                            <input style="width: 20px" type="tel" id="amount" value="<%= product.user_amount %>" min="1"
+                                   max="<%= product.amount %>" data="<%= (product.price / 100).toFixed(2) %>">
+                            <button id="favourite">ULUBIONE</button>
+                            <button id="delete">USUN</button>
+                            <div id="product_id" style="display: none"><%= product.product_id %></div>
+                        </div>
                     </div>
 
-                    <div class="right">
-                        <%=(product.price / 100).toFixed(2)%> zł
-                        <input name="amount" value="<=product.user_amount" min="1" max="product.amount">
-                        <button>ULUBIONE</button>
-                        <button>USUN</button>
-                    </div>
-                </div>
+                </li>
 
-            </li>
+                <%
+                }) %>
+            </ul>
+        </div>
 
-            <%
-            })%>
-        </ul>
+        <div class="checkoutSummary">
+            <div>Łączna kwota zamówienia: <span id="sum"></span></div>
+            <button id="sendCheckout">Zloz zamowienie</button>
+        </div>
     </div>
 
-    <div class="checkoutSummary">
-        Łączna kwota zamówienia: 1000 zl
-        <button>Zloz zamowienie</button>
-    </div>
 </div>
 
 
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
 <script>
+
+    let user_id = <%=user.id%>
+
+    function main() {
+        let sum = 0
+        let products = document.getElementsByName('product')
+
+        if (products.length > 0){
+            document.getElementById('empty').style.visibility = 'hidden'
+            document.getElementById('checkout').style.visibility = 'visible'
+        }
+        else {
+            document.getElementById('checkout').style.visibility = 'hidden'
+            document.getElementById('empty').style.visibility = 'visible'
+        }
+
+        products
+            .forEach(element => {
+
+                let price = Number(element.querySelector('#price').textContent) * 100
+                let input = element.querySelector('#amount')
+                sum += price * Number(input.value)      //sum of checkout
+
+                let product_id = element.querySelector('#product_id').textContent
+
+                //changing number of products in checkout
+                input.addEventListener('change', event => {
+                    if (Number(input.value) > Number(input.max)) {
+                        input.value = input.max
+                    }
+
+                    if (Number(input.value) <= 0) {
+                        input.value = 0
+                    }
+
+
+                    axios.put('http://localhost:3000/checkout/' + user_id + '/' + product_id, {
+                        amount: input.value
+                    })
+                    .then((res) => {
+                        if (res.status == 200){
+                                document.getElementById('message').textContent = 'Zmieniono wartosc koszyka'
+                        }
+                        else {
+                                document.getElementById('message').textContent = 'Nie udalo sie zmienic wartosci koszyka'
+                        }
+                    })
+                    .then(() =>{
+                        main()
+                    })
+
+                })
+
+                //delete product from checkout
+                element.querySelector('#delete')
+                    .addEventListener('click', event =>{
+
+                        axios.delete('http://localhost:3000/checkout/' + user_id + '/' + product_id,{
+
+                        })
+                            .then((res) => {
+                                if (res.status == 200){
+                                    document.getElementById('message').textContent = 'Usunieto produkt z koszyka'
+                                    element.remove()
+                                }
+                                else {
+                                    document.getElementById('message').textContent = 'Nie udalo sie usunoc produktu z koszyka'
+                                }
+                            })
+                            .then(() =>{
+                                main()
+                            })
+
+                    })
+
+
+                //send checkout
+
+
+            })
+
+        document.getElementById('sum').textContent = (sum / 100).toFixed(2)
+
+        document.getElementById('sendCheckout')
+            .addEventListener('click',event => {
+                axios.post('http://localhost:3000/orders/' + user_id)
+                    .then((res) => {
+                        if (res.status == 200){
+                            document.getElementById('message').textContent = 'Zlozono zamowienie'
+                        }
+                        else {
+                            document.getElementById('message').textContent = 'Nie udalo sie zlozyc zamowienia'
+                        }
+                    })
+            })
+    }
+
+
+
+
+    main()
 
 </script>
 </body>
