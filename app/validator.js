@@ -35,12 +35,12 @@ function validUser(user){
 
     if(user.postal.length !== 5){
         message.error = true
-        message.postal = "Phone must contain exactly 5 numbers"
+        message.postal = "Postal code must contain exactly 5 numbers"
     }
 
     if(!Number(user.postal)){
         message.error = true
-        message.postal = "Phone must be number"
+        message.postal = "Postal code must be number"
     }
 
     for (let i in userSetting){
@@ -75,23 +75,23 @@ function validProduct(product){
     message.error = false;
     if (product.name > 20) {
         message.error = true;
-        message.name = "Name can't be longer than 20 characters!";
+        message.name = "Name cannot be longer than 20 characters!";
     }
     if (product.name == "") {
         message.error = true;
-        message.name = "Name mustn't be empty!";
+        message.name = "Name cannot be empty!";
     }
     if (product.price < 0) {
         message.error = true;
-        message.price = "Price can't be negative!";
+        message.price = "Price cannot be negative!";
     }
     if (product.amount < 0) {
         message.error = true;
-        message.amount = "Amount can't be negative!";
+        message.amount = "Amount cannot be negative!";
     }
     if (product.description == "") {
         message.error = true;
-        message.description = "Description mustn't be empty!";
+        message.description = "Description cannot be empty!";
     }
     return message;
 }
