@@ -74,7 +74,6 @@
                             <span id="price"><%= (product.price / 100).toFixed(2) %></span>
                             <input style="width: 20px" type="tel" id="amount" value="<%= product.user_amount %>" min="1"
                                    max="<%= product.amount %>" data="<%= (product.price / 100).toFixed(2) %>">
-                            <button id="favourite">ULUBIONE</button>
                             <button id="delete">USUN</button>
                             <div id="product_id" style="display: none"><%= product.product_id %></div>
                         </div>

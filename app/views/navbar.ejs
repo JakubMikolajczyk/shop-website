@@ -140,14 +140,6 @@
         <div class="dropdown-content">
             <% if (user.login !== '') {%>
 
-                <form action="/users/<%=user.id%>/settings" method="GET">
-                    <button class="but" type="submit">Ustawienia</button>
-                </form>
-
-                <form action="/favourites/<%=user.id%>" method="GET">
-                    <button class="but" type="submit">Obserwacje</button>
-                </form>
-
                 <form action="/checkout/<%=user.id%>" method="GET">
                     <button class="but" type="submit">Koszyk</button>
                 </form>
@@ -194,7 +186,6 @@
 
     <% if (user.login !== '') {%>
         <a href="/checkout/<%=user.id%>" style="float: right">Koszyk</a>
-        <a href="/favourite/<%=user.id%>" style="float: right">Obserwacje</a>
     <% } %>
 
     <div class="search">

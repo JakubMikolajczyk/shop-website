@@ -62,11 +62,6 @@
                             </form>
                             <button onclick="addToBasket(<%= user.id %>, <%= product.id%>)"> Dodaj do koszyka</button>
                         </li>
-                        <li>
-                            <form method="post" action="/favourites/<%- user.id %>/<%- product.id %>">
-                                <button type="submit"> Obserwuj </button>
-                            </form>
-                        </li>
                         <% } %>
                             <% if (user.isAdmin) { %>
                                 <li>
