@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Users </title>
+    <style>
+        .user_list {
+            margin: auto;
+            width: 50%;
+        }
+
+        li {
+            border: 10px;
+            display: inline-block;
+        }
+
+        .user {
+            display: inline;
+        }
+
+        .details {
+            float: left;
+            width: 50%;
+        }
+
+        .address {
+            float: right;
+            width: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include("navbar") %>
+        <div class="user_list">
+            <ul>
+                <% for(let i=0; i < array.length; i++) { %>
+                    <li>
+                        <div class="user">
+                            <div class="details">
+                                <ul>
+                                    <li>
+                                        <div>
+                                            Login:
+                                        </div>
+                                        <div>
+                                            <%= array[i].login %>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            Imię:
+                                        </div>
+                                        <div>
+                                            <%= array[i].name %>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            Nazwisko:
+                                        </div>
+                                        <div>
+                                            <%= array[i].surname %>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            Adres e-mail:
+                                        </div>
+                                        <div>
+                                            <%= array[i].mail %>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            Nr telefonu:
+                                        </div>
+                                        <div>
+                                            <%= array[i].phone %>
+                                        </div>
+                                    </li>
+
+                                </ul>
+                            </div>
+                            <div class="address">
+                                <ul>
+                                    <li>
+                                        <div>
+                                            Ulica:
+                                        </div>
+                                        <div>
+                                            <%= array[i].street %>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            Numer:
+                                        </div>
+                                        <div>
+                                            <%= array[i].number %>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            Kod pocztowy:
+                                        </div>
+                                        <div>
+                                            <%= array[i].postal %>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            Miejscowość:
+                                        </div>
+                                        <div>
+                                            <%= array[i].city %>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                    <% } %>
+
+            </ul>
+        </div>
+</body>
+
+</html>

@@ -42,7 +42,8 @@ router.get("/search", authorize.any, async (req, res) => {
 
 router.post("/search", authorize.any, async (req, res) => {
     let query = req.body.search;
-    
+    let products = await db.ProductDatabase.search(query);
+    return res.render("product_tile", {array: products, user: req.user});
 });
 
 // zwraca kartę produktu

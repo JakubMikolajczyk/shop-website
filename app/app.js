@@ -20,7 +20,8 @@ app.set('views', './views')
 app.use("/image", express.static("./database/photos"));
 app.use("/products", require("./routes/product.js"));
 app.use(require('./routes/index'))
-app.use('/users', require('./routes/login'))
+app.use("/users", require('./routes/login'))
+app.use("/orders", require("./routes/orders.js"));
 app.use('/checkout', require('./routes/checkout'))
 
 

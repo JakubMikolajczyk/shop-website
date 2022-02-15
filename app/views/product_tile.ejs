@@ -64,27 +64,33 @@
 <body>
     <%- include("navbar") %>
         <div class="product_list">
+            <ul>
+                <% for(let i=0; i < array.length; i++) { %>
+                    <li>
+                        <div class="product_tile">
 
-            <% for(let i=0; i < array.length; i++) { %>
-                <div class="product_tile">
+                            <div class="image">
+                                <img src="http://localhost:3000/image/<%- array[i].id %>.png"
+                                    alt="Unable to load the image.">
+                            </div>
+                            <div class="info">
+                                <div class="name">
+                                    <%= array[i].name %>
+                                </div>
+                                <div class="price">
+                                    Cena: <%= (array[i].price / 100).toFixed(2) %>
+                                </div>
+                                <div class="details">
+                                    <a href="/products/<%- array[i].id %>"> Pokaż szczegóły </a>
+                                </div>
+                            </div>
 
-                    <div class="image">
-                        <img src="http://localhost:3000/image/<%- array[i].id %>.png" alt="Unable to load the image.">
-                    </div>
-                    <div class="info">
-                        <div class="name">
-                            <%= array[i].name %>
-                        </div>
-                        <div class="price">
-                            Cena: <%= (array[i].price / 100).toFixed(2) %>
-                        </div>
-                        <div class="details">
-                            <a href="/products/<%- array[i].id %>"> Pokaż szczegóły </a>
-                        </div>
-                    </div>
 
-                </div>
-                <% } %>
+                        </div>
+                    </li>
+                    <% } %>
+
+            </ul>
         </div>
 </body>
 
