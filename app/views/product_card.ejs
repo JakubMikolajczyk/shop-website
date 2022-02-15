@@ -65,12 +65,12 @@
             </li>
 
             <li>
-                Cena: <%- (product.price / 100).toFixed(2) %>
+                Cena: <%- (product.price / 100).toFixed(2)%> zł
 
             </li>
             <% if (user.id) { %>
                 <li>
-                    <input type="number" id="amount" name="amount" min="1" max="<%= product.amount %>">
+                    Ilosc: <input type="number" id="amount" name="amount" min="1" max="<%= product.amount %>">
                     <button onclick="addToBasket(<%= user.id %>, <%= product.id %>)"> Dodaj do koszyka</button>
                 </li>
             <% } %>
