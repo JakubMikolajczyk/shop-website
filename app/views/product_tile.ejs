@@ -20,14 +20,15 @@
         div.product_tile {
             margin: 50px;
             position: relative;
+            border: 5px solid gray;
+            height: 150px;
         }
 
         div.image {
             position: absolute;
             width: 150px;
-            height: 150px;
-            border: 1px solid lightgrey;
             right: 0%;
+            height: 100%;
         }
 
         div.name {
@@ -36,19 +37,6 @@
             padding: 10px;
             display: inline;
             right: 0%;
-        }
-
-        div.details {
-            position: relative;
-            margin: 10px;
-            padding: 10px;
-            background-color: lightgreen;
-            text-align: center;
-            color: white;
-            border: dashed white;
-            display: inline;
-            right: 0px;
-            bottom: 0%;
         }
 
         div.price {
@@ -75,13 +63,10 @@
                             </div>
                             <div class="info">
                                 <div class="name">
-                                    <%= array[i].name %>
+                                    <a href="/products/<%- array[i].id %>"> <%= array[i].name %> </a>
                                 </div>
                                 <div class="price">
                                     Cena: <%= (array[i].price / 100).toFixed(2) %>
-                                </div>
-                                <div class="details">
-                                    <a href="/products/<%- array[i].id %>"> Pokaż szczegóły </a>
                                 </div>
                             </div>
 
