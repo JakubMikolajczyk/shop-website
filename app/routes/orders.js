@@ -26,18 +26,32 @@ router.get("/:user_id", authorize.isUser, async (req, res) => {
     return res.render("order_list", { array: orders, user: req.user });
 })
 
-router.post("/:user_id", authorize.isUser, async (req, res) => {
-    let cart = await db.CartDatabase.getCart(req.user.user_id);
-    let order = {user_id: req.user.user_id, date: new Date(), status: 0};
-    if (await db.OrderDatabase.add(order)) {
-        cart.forEach(async item => {
-            await db.OrderDatabase.addContent(order, item.product_id, item.user_amount);
-        })
+// router.post("/:user_id", authorize.isUser, async (req, res) => {
+//
+//     let cart = await db.CartDatabase.getCart(req.user.user_id);
+//     let order = {user_id: req.user.user_id, date: new Date(), status: 0};
+//     if (await db.OrderDatabase.add(order)) {
+//         cart.forEach(async item => {
+//             await db.OrderDatabase.addContent(order, item.product_id, item.user_amount);
+//         })
+//         res.status(200).send()
+//     }
+//     else {
+//         res.status(404).send();
+//     }
+// });
+
+router.post('/:user_id', authorize.isUser, async (req, res) => {
+
+    if (await db.OrderDatabase.addV2({user_id: 2, date: new Date(), status: 0})){
+        res.status(200).send()
     }
     else {
-        res.redirect("/checkout/" + req.user.user_id);
+        res.status(404).send()
     }
-});
+
+
+})
 
 
 module.exports = router;

@@ -441,6 +441,57 @@ class ProductDatabase {
 }
 
 class OrderDatabase {
+
+    static async addV2(order = {}){
+
+        function dateToSQL(date) {
+            return date.toISOString().slice(0, 19).replace('T', ' ');
+        }
+
+        try {
+            let req = new mssql.Request()
+
+            if (!order || order.user_id === undefined || order.date === undefined || order.status === undefined) {
+                return false;
+            }
+
+                req.input("user_id", order.user_id);
+                req.input("date", dateToSQL(order.date));
+                req.input("status", order.status);
+
+                let checkout = await req.query(`select * from [CART]
+                                                                   where 1 = 1` +
+                                                (order.user_id    !== undefined ? " AND user_id = @user_id"       : "")
+                                                );
+                checkout = checkout.recordset
+
+                let res = await req.query(`insert into [ORDER]
+                                       (user_id, date, status)
+                                       values
+                                       (@user_id, @date, @status) select scope_identity() as id`);
+                let order_id = res.recordset[0].id
+
+                for (let product of checkout){
+                    let temp = new mssql.Request()
+                    temp.input("order_id", order_id);
+                    temp.input("product_id", product.product_id);
+                    temp.input("amount", product.amount);
+
+                    let res = await temp.query(`insert into [ORDER_CONTENT]
+                                       (order_id, product_id, amount)
+                                       values
+                                       (@order_id, @product_id, @amount)`);
+                }
+
+                return res.rowsAffected[0] != 0;
+            }
+            catch (err) {
+                console.log(err);
+                return false;
+            }
+    }
+
+
     static async read(order = {}) {
         try {
             let req = new mssql.Request();
@@ -771,6 +822,7 @@ class CartDatabase {
             return [];
         }
     }
+
 
     static async add(cartElement) {
         if(!cartElement || cartElement.user_id === undefined || cartElement.product_id === undefined || cartElement.amount === undefined) {
