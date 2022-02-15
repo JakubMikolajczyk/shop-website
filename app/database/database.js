@@ -613,8 +613,15 @@ class OrderDatabase {
             req.input("id", order.id);
 
             let res = await req.query(`select * from [ORDER_CONTENT]
-                                       where id=@id`);
-            return res.recordset;
+                                       join [PRODUCT] on [PRODUCT].id = [ORDER_CONTENT].product_id
+                                       where [ORDER_CONTENT].order_id=@id`);
+            let result = res.recordset;
+            
+            result.map(content => {
+                content.product_amount = content.amount[1];
+                content.amount = content.amount[0];
+            })
+            return result;
         }
         catch (err) {
             console.log(err);

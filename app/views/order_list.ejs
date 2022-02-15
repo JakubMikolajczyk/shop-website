@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders</title>
+    <style>
+        .order_list {
+            margin: auto;
+            width: 50%;
+        }
+
+        li {
+            border: 10px;
+            display: inline-block;
+        }
+
+        .order {
+            display: inline;
+        }
+
+        .details {
+            float: left;
+            width: 50%;
+        }
+
+        .content {
+            float: right;
+            width: 50%;
+        }
+    </style>
+</head>
+<body>
+    <%- include("navbar") %>
+        <div class="order_list">
+            <ul>
+                <% array.forEach( order => { %>
+                    <li>
+                        <div class="order">
+                            <div class="details">
+                                <ul>
+                                    <li>
+                                        <div>
+                                            Order number:
+                                        </div>
+                                        <div>
+                                            <%= order.id %>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            E-mail:
+                                        </div>
+                                        <div>
+                                            <%= order.user.mail %>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            Nr telefonu:
+                                        </div>
+                                        <div>
+                                            <%= order.user.phone %>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            Data:
+                                        </div>
+                                        <div>
+                                            <%= order.date %>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            Status:
+                                        </div>
+                                        <div>
+                                            <%= order.status == 0 ? "Złożone" : "Zakończone" %>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="content">
+                                <ul>
+                                    <% order.content.forEach(content => { %>
+                                        <li>
+                                            <div>
+                                                Nazwa:
+                                            </div>
+                                            <div>
+                                                <%= content.name %>
+                                            </div>
+                                            <div>
+                                                Ilość:
+                                            </div>
+                                            <div>
+                                                <%= content.amount %>
+                                            </div>
+                                            
+                                        </li>
+                                    <% }) %>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                    <% }) %>
+
+            </ul>
+        </div>
+</body>
+</html>

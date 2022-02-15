@@ -5,6 +5,11 @@ let db = require("../database/database");
 let bcrypt = require('bcrypt')
 let authorize = require('../authorize')
 
+router.get("/", authorize.isAdmin, async (req, res) => {
+    let users = await db.UserDatabase.read({valid: 1});
+    res.render("user_list", {user: req.user, array: users});
+});
+
 router.get('/register', authorize.isUnlogged, (req, res) => {
 
         res.render('register',{
