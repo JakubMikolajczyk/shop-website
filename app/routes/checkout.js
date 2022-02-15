@@ -43,16 +43,28 @@ router.post('/:user_id/:product_id', authorize.isUser, async (req, res) => {
         return updateCheckout(req,res)
     }
     else {
-        if (await db.CartDatabase.add({
+
+        let checkout = await db.CartDatabase.read({
             user_id: req.params.user_id,
             product_id: req.params.product_id,
-            amount: req.body.amount
-        })){
-            res.status(200).send()
+        })
+
+        if (checkout.length == 0){
+            if (await db.CartDatabase.add({
+                user_id: req.params.user_id,
+                product_id: req.params.product_id,
+                amount: req.body.amount
+            })){
+                res.status(200).send()
+            }
+            else {
+                res.status(404).send()
+            }
         }
         else {
-            res.status(404).send()
+            await updateCheckout(req, res)
         }
+
     }
 
 })
@@ -80,6 +92,8 @@ async function deleteProductFromCheckout(req, res){
 }
 
 async function updateCheckout(req, res){
+
+    console.log(req.body.amount)
     if (await db.CartDatabase.update({
         user_id: req.params.user_id,
         product_id: req.params.product_id,

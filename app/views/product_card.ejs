@@ -38,19 +38,7 @@
         }
     </style>
 </head>
-<script>
-    function addToBasket(user_id, product_id) {
-        let amount = document.getElementsByName("amount")[0].value;
-        axios.post(`/checkout/${user_id}/${product_id}`, { amount: amount }).then( res => {
-            if (res.status == 200) {
-                alert("Produkt dodany do koszuka!");
-            }
-            else {
-                alert("Operacja nie udała się.");
-            }
-        })
-    }
-</script>
+
 <body>
     <%- include("navbar") %>
 
@@ -70,7 +58,7 @@
                     <% if (user.id) {%>
                         <li>
                             <form method="post" action="/checkout/<%- user.id %>/<%- product.id %>">
-                                <input type="number" name="amount" min="1" max="<%=product.amount%>">
+                                <input type="number" id="amount" name="amount" min="1" max="<%=product.amount%>">
                             </form>
                             <button onclick="addToBasket(<%= user.id %>, <%= product.id%>)"> Dodaj do koszyka</button>
                         </li>
@@ -104,6 +92,35 @@
             </div>
 
         </div>
+
+
+    <script>
+
+        let input = document.getElementById('amount')
+        console.log(input)
+        input.addEventListener('change', event =>{
+            if (Number(input.value) > Number(input.max)) {
+                input.value = input.max
+            }
+
+            if (Number(input.value) <= 0) {
+                input.value = 1
+            }
+        })
+
+        function addToBasket(user_id, product_id) {
+            let amount = document.getElementsByName("amount")[0].value;
+            axios.post(`/checkout/${user_id}/${product_id}`, { amount: amount }).then( res => {
+                if (res.status == 200) {
+                    alert("Produkt dodany do koszuka!");
+                }
+                else {
+                    alert("Operacja nie udała się.");
+                }
+            })
+        }
+    </script>
+
 </body>
 
 </html>
