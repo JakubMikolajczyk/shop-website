@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+
+<%- include('navbar') %>
+
+<style>
+
+    li {
+        border: 1px solid #808080FF;
+        min-height: 50px;
+        font-size: 20px;
+        list-style-type: none;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+    }
+
+    .container{
+        width: 100%;
+    }
+
+    .left{
+        float: left;
+    }
+
+    .right{
+        float: right;
+    }
+
+    .checkoutSummary{
+        float: right;
+        width: 28%;
+        position: fixed;
+        right: 0;
+        top: 70px;
+        border-style: groove;
+        border-color: yellow;
+
+    }
+</style>
+
+<div>
+    <div class="left" style="width: 70%">
+        <ul>
+            <% checkout.forEach( product => {
+            %>
+
+            <li>
+                <div class="container">
+                    <div class="left">
+                        <a href="http://localhost:3000/products/<%=product.product_id%>">Nazwa produktu</a>
+                    </div>
+
+                    <div class="right">
+                        <%=(product.price / 100).toFixed(2)%> zł
+                        <input name="amount" value="<=product.user_amount" min="1" max="product.amount">
+                        <button>ULUBIONE</button>
+                        <button>USUN</button>
+                    </div>
+                </div>
+
+            </li>
+
+            <%
+            })%>
+        </ul>
+    </div>
+
+    <div class="checkoutSummary">
+        Łączna kwota zamówienia: 1000 zl
+        <button>Zloz zamowienie</button>
+    </div>
+</div>
+
+
+
+<script>
+
+</script>
+</body>
+</html>
