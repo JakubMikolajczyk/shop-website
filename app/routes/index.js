@@ -4,9 +4,7 @@ let db = require('../database/database');
 let authorize = require('../authorize')
 
 router.get('/', authorize.any,(req,res) => {
-    res.render('index',{
-        user: req.user
-    })
+    res.redirect("/products/search")
 })
 
 module.exports =  router;
