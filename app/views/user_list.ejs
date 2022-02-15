@@ -10,10 +10,22 @@
         .user_list {
             margin: auto;
             width: 50%;
+
+        }
+
+        .main {
+            border: 1px solid #808080FF;
+            margin: 20px;
+            min-height: 50px;
+            list-style-type: none;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+
         }
 
         li {
-            border: 10px;
+            margin: 3px;
             display: inline-block;
         }
 
@@ -38,18 +50,10 @@
         <div class="user_list">
             <ul>
                 <% for(let i=0; i < array.length; i++) { %>
-                    <li>
+                    <li class="main">
                         <div class="user">
                             <div class="details">
                                 <ul>
-                                    <li>
-                                        <div>
-                                            Login:
-                                        </div>
-                                        <div>
-                                            <%= array[i].login %>
-                                        </div>
-                                    </li>
                                     <li>
                                         <div>
                                             Imię:
