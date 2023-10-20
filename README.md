@@ -1,10 +1,12 @@
 # shop-website
 
-## Technology:
+## Techstack:
 * node.js
 * express.js
 * mssql
 * ejs
+* HTML
+* CSS
 
 ## Features:
 * Everyone:
